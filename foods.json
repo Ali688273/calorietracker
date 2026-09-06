@@ -1,0 +1,84 @@
+[
+  {
+    "category": "میوه‌ها",
+    "items": [
+      {"name": "سیب سرخ / سبز", "unit": "۱ عدد متوسط (۱۵۰ گرم)", "calories": 95, "protein": 0.5, "carbs": 25, "fat": 0.3},
+      {"name": "موز", "unit": "۱ عدد متوسط (۱۲۰ گرم)", "calories": 105, "protein": 1.3, "carbs": 27, "fat": 0.4},
+      {"name": "پرتقال", "unit": "۱ عدد متوسط (۱۳۰ گرم)", "calories": 62, "protein": 1.2, "carbs": 15, "fat": 0.2},
+      {"name": "خیار", "unit": "۱ عدد متوسط (۱۰۰ گرم)", "calories": 15, "protein": 0.7, "carbs": 3.6, "fat": 0.1},
+      {"name": "گوجه فرنگی", "unit": "۱ عدد متوسط (۱۲۰ گرم)", "calories": 22, "protein": 1.1, "carbs": 4.8, "fat": 0.2},
+      {"name": "توت فرنگی", "unit": "۱ لیوان (۱۵۰ گرم)", "calories": 49, "protein": 1.0, "carbs": 11.7, "fat": 0.5},
+      {"name": "هندوانه", "unit": "۱ اسلایس (۲۸۰ گرم)", "calories": 86, "protein": 1.7, "carbs": 21.6, "fat": 0.4},
+      {"name": "انگور", "unit": "۱ لیوان (۱۵۰ گرم)", "calories": 104, "protein": 1.1, "carbs": 27.3, "fat": 0.2},
+      {"name": "گیلاس / آلبالو", "unit": "۱ لیوان (۱۴۰ گرم)", "calories": 87, "protein": 1.5, "carbs": 22.1, "fat": 0.3},
+      {"name": "انار", "unit": "۱ عدد متوسط (۲۸۰ گرم)", "calories": 234, "protein": 4.7, "carbs": 52.7, "fat": 3.3},
+      {"name": "هلو / شلیل", "unit": "۱ عدد متوسط (۱۵۰ گرم)", "calories": 58, "protein": 1.4, "carbs": 14.3, "fat": 0.4},
+      {"name": "کیوی", "unit": "۱ عدد متوسط (۷۵ گرم)", "calories": 42, "protein": 0.8, "carbs": 10.1, "fat": 0.4},
+      {"name": "خرما", "unit": "۱ عدد (۸ گرم)", "calories": 23, "protein": 0.2, "carbs": 6.2, "fat": 0.0}
+    ]
+  },
+  {
+    "category": "غذاهای ایرانی",
+    "items": [
+      {"name": "چلو سفید با روغن", "unit": "۱ کفگیر (۱۶۰ گرم)", "calories": 250, "protein": 4.2, "carbs": 44.0, "fat": 6.5},
+      {"name": "قرمه سبزی با برنج", "unit": "۱ بشقاب (۴۰۰ گرم)", "calories": 620, "protein": 24.0, "carbs": 68.0, "fat": 28.0},
+      {"name": "قیمه با برنج", "unit": "۱ بشقاب (۴۰۰ گرم)", "calories": 580, "protein": 22.0, "carbs": 72.0, "fat": 22.0},
+      {"name": "زرشک پلو با مرغ", "unit": "۱ بشقاب (۴۵۰ گرم)", "calories": 670, "protein": 38.0, "carbs": 78.0, "fat": 21.0},
+      {"name": "کباب کوبیده", "unit": "۱ سیخ (۱۰۰ گرم)", "calories": 290, "protein": 18.0, "carbs": 2.0, "fat": 23.0},
+      {"name": "جوجه کباب", "unit": "۱ سیخ (۱۵۰ گرم)", "calories": 270, "protein": 31.0, "carbs": 1.5, "fat": 15.0},
+      {"name": "آبگوشت با نان", "unit": "۱ کاسه (۵۰۰ گرم)", "calories": 750, "protein": 35.0, "carbs": 65.0, "fat": 38.0},
+      {"name": "عدس پلو با گوشت", "unit": "۱ بشقاب (۳۵۰ گرم)", "calories": 520, "protein": 21.0, "carbs": 75.0, "fat": 14.0},
+      {"name": "کتلت گوشت", "unit": "۱ عدد متوسط (۶۰ گرم)", "calories": 150, "protein": 8.0, "carbs": 6.0, "fat": 11.0},
+      {"name": "کوکو سبزی", "unit": "۱ برش متوسط (۷۰ گرم)", "calories": 130, "protein": 4.5, "carbs": 5.0, "fat": 10.0},
+      {"name": "آش رشته", "unit": "۱ کاسه متوسط (۲۵۰ گرم)", "calories": 280, "protein": 10.0, "carbs": 42.0, "fat": 8.0}
+    ]
+  },
+  {
+    "category": "نان و غلات",
+    "items": [
+      {"name": "نان سنگک", "unit": "۱ کف دست (۳۰ گرم)", "calories": 75, "protein": 2.8, "carbs": 14.5, "fat": 0.6},
+      {"name": "نان لواش", "unit": "۱ کف دست (۲۰ گرم)", "calories": 50, "protein": 1.6, "carbs": 10.2, "fat": 0.4},
+      {"name": "نان بربری", "unit": "۱ کف دست (۳۰ گرم)", "calories": 80, "protein": 2.6, "carbs": 15.8, "fat": 0.5},
+      {"name": "نان تست سفید", "unit": "۱ اسلایس (۲۵ گرم)", "calories": 67, "protein": 2.0, "carbs": 12.3, "fat": 0.9},
+      {"name": "نان تست جو", "unit": "۱ اسلایس (۲۸ گرم)", "calories": 69, "protein": 3.1, "carbs": 11.8, "fat": 1.1},
+      {"name": "جو دوسر پرک", "unit": "۱/۲ لیوان (۴۰ گرم)", "calories": 150, "protein": 5.0, "carbs": 27.0, "fat": 2.5},
+      {"name": "ماکارونی پخته", "unit": "۱ لیوان (۱۴۰ گرم)", "calories": 220, "protein": 8.0, "carbs": 43.0, "fat": 1.3}
+    ]
+  },
+  {
+    "category": "پروتئین و گوشت",
+    "items": [
+      {"name": "تخم مرغ آب‌پز", "unit": "۱ عدد (۵۰ گرم)", "calories": 78, "protein": 6.3, "carbs": 0.6, "fat": 5.3},
+      {"name": "تخم مرغ نیمرو", "unit": "۱ عدد (۶۰ گرم)", "calories": 110, "protein": 6.3, "carbs": 0.6, "fat": 9.0},
+      {"name": "سینه مرغ پخته", "unit": "۱۰۰ گرم", "calories": 165, "protein": 31.0, "carbs": 0.0, "fat": 3.6},
+      {"name": "ران مرغ", "unit": "۱۰۰ گرم", "calories": 209, "protein": 26.0, "carbs": 0.0, "fat": 10.9},
+      {"name": "گوشت گوساله", "unit": "۱۰۰ گرم", "calories": 217, "protein": 26.1, "carbs": 0.0, "fat": 11.8},
+      {"name": "گوشت گوسفند", "unit": "۱۰۰ گرم", "calories": 282, "protein": 25.0, "carbs": 0.0, "fat": 19.5},
+      {"name": "تن ماهی", "unit": "۱ قوطی (۱۲۰ گرم)", "calories": 230, "protein": 32.0, "carbs": 0.0, "fat": 10.0}
+    ]
+  },
+  {
+    "category": "حبوبات و سبزیجات",
+    "items": [
+      {"name": "عدس پخته", "unit": "۱ لیوان (۲۰۰ گرم)", "calories": 230, "protein": 18.0, "carbs": 40.0, "fat": 0.8},
+      {"name": "نخود پخته", "unit": "۱ لیوان (۲۰۰ گرم)", "calories": 269, "protein": 14.5, "carbs": 45.0, "fat": 4.2},
+      {"name": "لوبیا قرمز پخته", "unit": "۱ لیوان (۱۷۷ گرم)", "calories": 225, "protein": 15.3, "carbs": 40.0, "fat": 0.9},
+      {"name": "سیب زمینی آب‌پز", "unit": "۱ عدد متوسط (۱۵۰ گرم)", "calories": 130, "protein": 3.0, "carbs": 30.0, "fat": 0.2},
+      {"name": "سیب زمینی سرخ‌کرده", "unit": "۱ بشقاب کوچک (۱۰۰ گرم)", "calories": 312, "protein": 3.4, "carbs": 41.0, "fat": 15.0},
+      {"name": "قارچ پخته", "unit": "۱ لیوان (۱۰۰ گرم)", "calories": 28, "protein": 3.0, "carbs": 4.0, "fat": 0.3},
+      {"name": "کاهو / اسفناج", "unit": "۲ لیوان (۱۰۰ گرم)", "calories": 15, "protein": 1.2, "carbs": 2.9, "fat": 0.2}
+    ]
+  },
+  {
+    "category": "لبنیات و تنقلات",
+    "items": [
+      {"name": "شیر کم‌چرب", "unit": "۱ لیوان (۲۴۰ گرم)", "calories": 102, "protein": 8.2, "carbs": 12.0, "fat": 3.6},
+      {"name": "ماست کم‌چرب", "unit": "۱ لیوان (۲۰۰ گرم)", "calories": 110, "protein": 9.0, "carbs": 12.0, "fat": 3.0},
+      {"name": "پنیر سفید", "unit": "۱ قوطی کبریت (۳۰ گرم)", "calories": 75, "protein": 5.5, "carbs": 1.0, "fat": 5.5},
+      {"name": "گردو", "unit": "۲ عدد کامل (۱۵ گرم)", "calories": 98, "protein": 2.2, "carbs": 2.0, "fat": 9.8},
+      {"name": "بادام درختی", "unit": "۱۰ عدد (۱۲ گرم)", "calories": 70, "protein": 2.5, "carbs": 2.6, "fat": 6.0},
+      {"name": "پسته", "unit": "۲۰ عدد (۱۵ گرم)", "calories": 85, "protein": 3.0, "carbs": 4.1, "fat": 7.0},
+      {"name": "شکلات تلخ ۷۰٪", "unit": "۲ مربع کوچک (۲۰ گرم)", "calories": 120, "protein": 1.6, "carbs": 9.0, "fat": 8.5}
+    ]
+  }
+    ]
