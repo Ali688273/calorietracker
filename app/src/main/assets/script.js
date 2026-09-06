@@ -1,75 +1,158 @@
 let foodsData = [];
 let selectedCategory = 'همه';
+let userProfile = { gender: 'male', age: 25, height: 175, weight: 70, goal: 'maintain', targetCal: 2000 };
+let todayLogs = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+    loadTodayLogs();
+
     fetch('foods.json')
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             foodsData = data;
             renderFoods(foodsData);
         })
-        .catch(error => console.error("خطا در بارگذاری دیتابیس:", error));
+        .catch(err => console.error("Error loading foods:", err));
 
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', handleSearch);
+    document.getElementById('searchInput').addEventListener('input', handleSearch);
 });
 
+function switchTab(tabName, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    btn.classList.add('active');
+}
+
 function renderFoods(foods) {
-    const foodListContainer = document.getElementById('foodList');
-    foodListContainer.innerHTML = '';
+    const container = document.getElementById('foodList');
+    container.innerHTML = '';
+    const limited = foods.slice(0, 50);
 
-    // رندر حداکثر ۵۰ مورد در مرحله اول جهت حفظ سرعت و روانی برنامه
-    const limitedFoods = foods.slice(0, 50);
-
-    if (limitedFoods.length === 0) {
-        foodListContainer.innerHTML = '<p style="text-align:center; color:#888;">هیچ غذایی یافت نشد.</p>';
+    if (limited.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#888;">غذایی یافت نشد.</p>';
         return;
     }
 
-    limitedFoods.forEach(food => {
-        const card = document.createElement('div');
-        card.className = 'food-card';
-        card.innerHTML = `
+    limited.forEach(food => {
+        const item = document.createElement('div');
+        item.className = 'food-item';
+        item.innerHTML = `
             <div class="food-info">
                 <h4>${food.name}</h4>
-                <p>کالری: ${food.calories} | پروتئین: ${food.protein}g | کربوهیدرات: ${food.carbs}g (${food.unit})</p>
+                <p>کالری: ${food.calories} | پ: ${food.protein}g | ک: ${food.carbs}g | چ: ${food.fat}g (${food.unit})</p>
             </div>
-            <button class="add-btn" onclick="selectFood(${food.id})">+ ثبت</button>
+            <button class="btn" onclick="addFoodToToday(${food.id})">+ ثبت</button>
         `;
-        foodListContainer.appendChild(card);
+        container.appendChild(item);
     });
 }
 
 function handleSearch() {
-    const query = document.getElementById('searchInput').value.trim().toLowerCase();
-    
-    const filtered = foodsData.filter(food => {
-        const matchesCategory = (selectedCategory === 'همه' || food.category === selectedCategory);
-        const matchesSearch = food.name.toLowerCase().includes(query);
-        return matchesCategory && matchesSearch;
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = foodsData.filter(f => {
+        const matchCat = (selectedCategory === 'همه' || f.category === selectedCategory);
+        const matchSearch = f.name.toLowerCase().includes(q);
+        return matchCat && matchSearch;
     });
-
     renderFoods(filtered);
 }
 
-function filterCategory(category) {
-    selectedCategory = category;
-    
-    const buttons = document.querySelectorAll('.cat-btn');
-    buttons.forEach(btn => {
-        if (btn.innerText.trim() === category.trim()) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+function filterCategory(cat) {
+    selectedCategory = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => {
+        if (b.innerText.trim() === cat.trim()) b.classList.add('active');
+        else b.classList.remove('active');
     });
-
     handleSearch();
 }
 
-function selectFood(id) {
+function saveProfile() {
+    userProfile.gender = document.getElementById('gender').value;
+    userProfile.age = parseInt(document.getElementById('age').value) || 25;
+    userProfile.height = parseInt(document.getElementById('height').value) || 175;
+    userProfile.weight = parseInt(document.getElementById('weight').value) || 70;
+    userProfile.goal = document.getElementById('goal').value;
+
+    // فرمول BMR مِفلین-جئور
+    let bmr = (10 * userProfile.weight) + (6.25 * userProfile.height) - (5 * userProfile.age);
+    bmr += (userProfile.gender === 'male') ? 5 : -161;
+    let tdee = bmr * 1.375; // فعالیت متوسط
+
+    if (userProfile.goal === 'lose') tdee -= 400;
+    else if (userProfile.goal === 'gain') tdee += 400;
+
+    userProfile.targetCal = Math.round(tdee);
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    updateUI();
+    alert('پروفایل و هدف کالری شما با موفقیت محاسبه و ذخیره شد.');
+}
+
+function loadProfile() {
+    const saved = localStorage.getItem('userProfile');
+    if (saved) {
+        userProfile = JSON.parse(saved);
+        document.getElementById('gender').value = userProfile.gender;
+        document.getElementById('age').value = userProfile.age;
+        document.getElementById('height').value = userProfile.height;
+        document.getElementById('weight').value = userProfile.weight;
+        document.getElementById('goal').value = userProfile.goal;
+    }
+    updateUI();
+}
+
+function addFoodToToday(id) {
     const food = foodsData.find(f => f.id === id);
     if (food) {
-        alert(`«${food.name}» با موفقیت ثبت شد.`);
+        todayLogs.push({ ...food, logId: Date.now() });
+        localStorage.setItem('todayLogs', JSON.stringify(todayLogs));
+        updateUI();
+        alert(`«${food.name}» به لیست امروز اضافه شد.`);
     }
+}
+
+function removeLog(logId) {
+    todayLogs = todayLogs.filter(l => l.logId !== logId);
+    localStorage.setItem('todayLogs', JSON.stringify(todayLogs));
+    updateUI();
+}
+
+function loadTodayLogs() {
+    const saved = localStorage.getItem('todayLogs');
+    if (saved) todayLogs = JSON.parse(saved);
+    updateUI();
+}
+
+function updateUI() {
+    document.getElementById('targetCal').innerText = userProfile.targetCal;
+    const consumed = todayLogs.reduce((sum, item) => sum + item.calories, 0);
+    document.getElementById('consumedCal').innerText = consumed;
+
+    const remain = userProfile.targetCal - consumed;
+    document.getElementById('remainCal').innerText = remain >= 0 ? `${remain} کالری باقی‌مانده` : `${Math.abs(remain)} کالری اضافه مصرف شده!`;
+
+    const percent = Math.min(100, Math.round((consumed / userProfile.targetCal) * 100));
+    document.getElementById('progressBar').style.width = `${percent}%`;
+
+    const todayContainer = document.getElementById('todayList');
+    todayContainer.innerHTML = '';
+
+    if (todayLogs.length === 0) {
+        todayContainer.innerHTML = '<p style="text-align:center; color:#888; font-size:12px;">هنوز چیزی ثبت نکرده‌اید.</p>';
+        return;
+    }
+
+    todayLogs.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'food-item';
+        div.innerHTML = `
+            <div class="food-info">
+                <h4>${item.name}</h4>
+                <p>${item.calories} کالری | ${item.unit}</p>
+            </div>
+            <button class="btn btn-danger" onclick="removeLog(${item.logId})">حذف</button>
+        `;
+        todayContainer.appendChild(div);
+    });
 }
