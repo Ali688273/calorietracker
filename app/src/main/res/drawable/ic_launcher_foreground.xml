@@ -1,0 +1,32 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- پس‌زمینه لایه جلو -->
+    <path
+        android:pathData="M54,18 C73.882,18 90,34.118 90,54 C90,73.882 73.882,90 54,90 C34.118,90 18,73.882 18,54 C18,34.118 34.118,18 54,18 Z"
+        android:fillColor="#E8F5E9"/>
+
+    <!-- شکل سیب -->
+    <path
+        android:pathData="M54,34 C43,26 27,33 27,50 C27,72 45,82 54,88 C63,82 81,72 81,50 C81,33 65,26 54,34 Z"
+        android:fillColor="#4CAF50"/>
+
+    <!-- برگ سیب -->
+    <path
+        android:pathData="M54,32 C58,23 67,21 71,22 C69,29 62,33 54,32 Z"
+        android:fillColor="#2E7D32"/>
+
+    <!-- شعله انرژی کالری -->
+    <path
+        android:pathData="M54,80 C62,80 68,73 68,65 C68,57 61,50 54,41 C47,50 40,57 40,65 C40,73 46,80 54,80 Z"
+        android:fillColor="#FF9800"/>
+        
+    <!-- مرکز شعله -->
+    <path
+        android:pathData="M54,80 C58,80 61,76 61,71 C61,66 57,62 54,56 C51,62 47,66 47,71 C47,76 50,80 54,80 Z"
+        android:fillColor="#FF5722"/>
+</vector>
