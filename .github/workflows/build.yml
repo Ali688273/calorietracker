@@ -27,8 +27,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || true
+    # ساخت فایل gradlew در صورت عدم وجود و دادن دسترسی اجرای آن
+    - name: Ensure gradlew exists
+      run: |
+        if [ ! -f "gradlew" ]; then
+          gradle wrapper
+        fi
+        chmod +x gradlew
 
     - name: Build with Gradle
       run: ./gradlew assembleRelease
