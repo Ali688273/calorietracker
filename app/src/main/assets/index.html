@@ -17,7 +17,33 @@
         }
         * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
         body { background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 70px; }
-        .header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        /* هدر جدید همراه با آیکون */
+        .header { 
+            background: linear-gradient(135deg, #4CAF50, #2E7D32); 
+            color: white; 
+            padding: 15px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 18px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
         .container { padding: 15px; max-width: 500px; margin: 0 auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -49,7 +75,18 @@
     </style>
 </head>
 <body>
-    <div class="header">کالری‌شمار هوشمند</div>
+
+    <!-- هدر همراه با آیکون SVG اختصاصی -->
+    <div class="header">
+        <div class="header-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" fill="#E8F5E9"/>
+                <path d="M12 6C12 6 13.5 8 15 8C16.5 8 18 6.5 18 6.5C18 6.5 17.5 10 15 11.5C13.5 12.4 12 11 12 11" stroke="#2E7D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 18C14.2091 18 16 16.2091 16 14C16 12.5 14.5 11 12 9.5C9.5 11 8 12.5 8 14C8 16.2091 9.79086 18 12 18Z" fill="#FF9800"/>
+            </svg>
+        </div>
+        <span>کالری‌شمار هوشمند</span>
+    </div>
 
     <div class="container">
         <!-- تب امروز -->
