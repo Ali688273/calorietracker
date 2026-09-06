@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>کالری‌شمار هوشمند</title>
+  <!-- فونت Vazirmatn و Chart.js -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-light: #81c784;
+      --accent: #f57c00;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --text: #212121;
+      --text-secondary: #666666;
+      --border: #e0e0e0;
+      --danger: #d32f2f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      min-height: 100vh;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 16px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* کارت‌ها */
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
+
+    /* فرم‌ها */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+
+    button.btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    button.btn-primary:active {
+      background: var(--primary-light);
+    }
+
+    /* خلاصه خلاصه روزانه */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .summary-item {
+      background: var(--bg);
+      padding: 12px 8px;
+      border-radius: 8px;
+    }
+
+    .summary-item .num {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .summary-item .label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* دکمه‌های دسته‌بندی غذا */
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .category-btn {
+      white-space: nowrap;
+      padding: 6px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: auto;
+    }
+
+    .category-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* لیست آیتم‌ها */
+    .food-list, .log-list {
+      list-style: none;
+    }
+
+    .food-item, .log-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .food-info h4 {
+      font-size: 0.95rem;
+    }
+
+    .food-info p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .add-btn {
+      width: auto;
+      padding: 6px 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: auto;
+    }
+
+    /* نوار ناوبری پایین */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      cursor: pointer;
+      gap: 2px;
+    }
+
+    .nav-btn.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <h1 id="page-title">کالری‌شمار هوشمند</h1>
+  </header>
+
+  <!-- زبانه ۱: داشبورد اصلی -->
+  <div id="tab-home" class="tab-content active">
+    <div class="card">
+      <h2>خلاصه امروز</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="num" id="target-cal">0</div>
+          <div class="label">هدف (کالری)</div>
+        </div>
+        <div class="summary-item">
+          <div class="num" id="consumed-cal">0</div>
+          <div class="label">دریافتی</div>
+        </div>
+        <div class="summary-item">
+          <div class="num" id="burned-cal">0</div>
+          <div class="label">سوخته شده</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; text-align: center;">
+        <span style="font-size: 0.9rem; color: var(--text-secondary);">باقیمانده: </span>
+        <strong id="remaining-cal" style="font-size: 1.1rem; color: var(--primary);">0</strong>
+        <span style="font-size: 0.8rem;">کالری</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>ثبت‌شده‌های امروز</h2>
+      <ul id="today-logs" class="log-list">
+        <!-- آیتم‌های ثبت شده امروز اینجا اضافه می‌شوند -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- زبانه ۲: انتخاب غذا و خوراکی‌ها -->
+  <div id="tab-food" class="tab-content">
+    <div class="card">
+      <input type="text" id="food-search" placeholder="جستجوی غذا یا میوه..." style="margin-bottom: 12px;">
+      <div class="category-scroll" id="category-container">
+        <!-- دکمه‌های دسته‌بندی dynamically اضافه می‌شوند -->
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>لیست مواد غذایی</h2>
+      <ul id="food-list" class="food-list">
+        <!-- غذاها بر اساس دسته‌بندی بارگذاری می‌شوند -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- زبانه ۳: ثبت فعالیت و ورزش -->
+  <div id="tab-exercise" class="tab-content">
+    <div class="card">
+      <h2>ثبت فعالیت ورزشی</h2>
+      <div class="form-group">
+        <label>نوع فعالیت</label>
+        <select id="exercise-type">
+          <option value="4">پیاده‌روی معمولی (سرعت متوسط)</option>
+          <option value="7">پیاده‌روی تند / دویدن سبک</option>
+          <option value="10">دویدن سریع</option>
+          <option value="6">دوچرخه‌سواری متوسط</option>
+          <option value="8">شنا کردن</option>
+          <option value="5">تمرین با وزنه / بدنسازی</option>
+          <option value="3">کار خانه / فعالیت روزمره</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>مدت زمان (دقیقه)</label>
+        <input type="number" id="exercise-duration" placeholder="مثلاً ۳۰">
+      </div>
+      <button class="btn-primary" onclick="addExerciseLog()">ثبت فعالیت</button>
+    </div>
+  </div>
+
+  <!-- زبانه ۴: آمار -->
+  <div id="tab-stats" class="tab-content">
+    <div class="card">
+      <h2>نمودار مصرف هفته</h2>
+      <canvas id="weeklyChart" width="400" height="250"></canvas>
+    </div>
+  </div>
+
+  <!-- زبانه ۵: تنظیمات و مشخصات فردی -->
+  <div id="tab-profile" class="tab-content">
+    <div class="card">
+      <h2>مشخصات شما (محاسبه کالری)</h2>
+      <div class="form-group">
+        <label>جنسیت</label>
+        <select id="user-gender">
+          <option value="male">مرد</option>
+          <option value="female">زن</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>سن (سال)</label>
+        <input type="number" id="user-age" placeholder="مثلاً ۲۵">
+      </div>
+      <div class="form-group">
+        <label>قد (سانتی‌متر)</label>
+        <input type="number" id="user-height" placeholder="مثلاً ۱۷۵">
+      </div>
+      <div class="form-group">
+        <label>وزن (کیلوگرم)</label>
+        <input type="number" id="user-weight" placeholder="مثلاً ۷۰">
+      </div>
+      <div class="form-group">
+        <label>میزان فعالیت روزانه</label>
+        <select id="user-activity">
+          <option value="1.2">کم (بدون ورزش / کارمندی)</option>
+          <option value="1.375">سبک (۱ تا ۳ جلسه ورزش در هفته)</option>
+          <option value="1.55">متوسط (۳ تا ۵ جلسه ورزش در هفته)</option>
+          <option value="1.725">زیاد (۶ تا ۷ جلسه ورزش سنگین)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>هدف وزنی</label>
+        <select id="user-goal">
+          <option value="-500">کاهش وزن (کاهش نیم کیلو در هفته)</option>
+          <option value="0">تثبیت وزن فعلی</option>
+          <option value="500">افزایش وزن (افزایش نیم کیلو در هفته)</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="saveProfile()">ذخیره و محاسبه مجدد کالری</button>
+    </div>
+  </div>
+
+  <!-- نوار ناوبری پایین صفحه -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home', this)">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      امروز
+    </button>
+    <button class="nav-btn" onclick="switchTab('food', this)">
+      <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.45 4.38l-.95 7.62h2l.95-7.62C10.54 12.9 12 11.12 12 9V2h-1v7zm6-7v18h2V12h2V2h-4z"/></svg>
+      غذاها
+    </button>
+    <button class="nav-btn" onclick="switchTab('exercise', this)">
+      <svg viewBox="0 0 24 24"><path d="M20.5 6c-2.61 0-4.83 1.67-5.65 4H9.15C8.33 7.67 6.11 6 3.5 6 1.57 6 0 7.57 0 9.5S1.57 13 3.5 13c2.61 0 4.83-1.67 5.65-4h5.7c.82 2.33 3.04 4 5.65 4 1.93 0 3.5-1.57 3.5-3.5S22.43 6 20.5 6z"/></svg>
+      ورزش
+    </button>
+    <button class="nav-btn" onclick="switchTab('stats', this)">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      آمار
+    </button>
+    <button class="nav-btn" onclick="switchTab('profile', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      پروفایل
+    </button>
+  </nav>
+</div>
+
+<script src="script.js"></script>
+</body>
+  </html>
