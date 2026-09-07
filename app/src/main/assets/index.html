@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>کالری‌شمار هوشمند</title>
+    <title>کالری‌شمار هوشمند آفلاین</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -11,6 +11,7 @@
             --card-border: #334155;
             --accent-green: #10b981;
             --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
         }
@@ -38,6 +39,7 @@
         .online-notice { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); border-radius: 10px; padding: 10px; font-size: 0.8rem; color: var(--accent-green); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
         .search-box { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem; outline: none; }
+        
         .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--card-border); cursor: pointer; }
         .item-card:active { background: #1e293b; }
         .item-info .name { font-weight: bold; font-size: 0.95rem; }
@@ -55,22 +57,19 @@
         .input-group label { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
         .input-group input, .input-group select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; }
 
-        /* Modal Overlay */
         .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--card-border); }
         .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; }
-
-        .loading-spinner { text-align: center; color: var(--text-sub); padding: 20px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-title">
-            <h1>کالری‌شمار هوشمند</h1>
+            <h1>کالری‌شمار آنلاین و آفلاین</h1>
             <span id="current-date">امروز</span>
         </div>
-        <div class="app-icon" title="سیب سبز">🍏</div>
+        <div class="app-icon">🍏</div>
     </header>
 
     <div class="container">
@@ -80,7 +79,7 @@
                 <h3>خلاصه انرژی امروز</h3>
                 <div class="summary-grid">
                     <div class="summary-box"><div class="val" id="consumed-cal">0</div><div class="lbl">دریافتی</div></div>
-                    <div class="summary-box"><div class="val" id="remaining-cal">0</div><div class="lbl">باقیمانده</div></div>
+                    <div class="summary-box"><div class="val" id="remaining-cal">2000</div><div class="lbl">باقیمانده</div></div>
                     <div class="summary-box"><div class="val burned" id="burned-cal">0</div><div class="lbl">سوخته شده</div></div>
                 </div>
             </div>
@@ -99,24 +98,24 @@
         <!-- خوراکی‌ها -->
         <div id="tab-foods" class="tab-content">
             <div class="online-notice">
-                <span>🌐</span>
-                <span>جستجو در بانک اطلاعاتی آفلاین + آنلاین (بیش از ۵۰,۰۰۰ غذا). برای جستجوی موارد پیشرفته اینترنت را روشن کنید.</span>
+                <span>⚡</span>
+                <span id="food-count-notice">در حال بارگذاری بانک داده...</span>
             </div>
-            <input type="text" id="food-search" class="search-box" placeholder="جستجوی میوه، سبزی یا غذا (مثلاً سیب، خیار، مرغ)..." oninput="handleFoodSearch()">
+            <input type="text" id="food-search" class="search-box" placeholder="جستجو بین صدها غذای ایرانی و خارجی..." oninput="handleFoodSearch()">
             <div id="food-list"></div>
         </div>
 
         <!-- کالری سوزی (ورزش) -->
         <div id="tab-burn" class="tab-content">
-            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی ورزش (دویدن، شنا، پیاده‌روی)..." oninput="renderWorkouts()">
+            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی ورزش (بوکس، شنا، دویدن، بدنسازی)..." oninput="renderWorkouts()">
             <div id="workout-list"></div>
         </div>
 
         <!-- آمار -->
         <div id="tab-stats" class="tab-content">
             <div class="card">
-                <h3>روند مصرف کالری ۷ روز گذشته</h3>
-                <div style="text-align:center; padding: 20px 0; color: var(--text-sub);">نمودار آمار هفتگی آماده ثبت داده‌های جدید است.</div>
+                <h3>روند مصرف کالری</h3>
+                <div style="text-align:center; padding: 20px 0; color: var(--text-sub);">ثبت داده‌های روزانه در این بخش محاسبه خواهد شد.</div>
             </div>
         </div>
 
@@ -153,7 +152,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- مودال‌ها -->
     <div id="modal-onboarding" class="modal">
         <div class="modal-content">
             <div class="modal-title">خوش آمدید! مشخصات خود را وارد کنید</div>
@@ -185,7 +184,7 @@
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- ناوبری پایین -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('dashboard', this)"><span class="icon">📊</span>داشبورد</div>
         <div class="nav-item" onclick="switchTab('foods', this)"><span class="icon">🥗</span>خوراکی‌ها</div>
@@ -195,68 +194,31 @@
     </nav>
 
     <script>
-        // دیتابیس محلی میوه‌ها، سبزیجات و غذاهای متداول
-        const localFoods = [
-            // میوه‌ها
-            { name: 'سیب', category: 'میوه', cal: 52, p: 0.3, c: 14, f: 0.2 },
-            { name: 'موز', category: 'میوه', cal: 89, p: 1.1, c: 23, f: 0.3 },
-            { name: 'پرتقال', category: 'میوه', cal: 47, p: 0.9, c: 12, f: 0.1 },
-            { name: 'خیار', category: 'میوه/سبزی', cal: 15, p: 0.7, c: 3.6, f: 0.1 },
-            { name: 'گوجه فرنگی', category: 'میوه/سبزی', cal: 18, p: 0.9, c: 3.9, f: 0.2 },
-            { name: 'هندوانه', category: 'میوه', cal: 30, p: 0.6, c: 8, f: 0.2 },
-            { name: 'خربزه / طالبی', category: 'میوه', cal: 34, p: 0.8, c: 8, f: 0.2 },
-            { name: 'انگور', category: 'میوه', cal: 69, p: 0.7, c: 18, f: 0.2 },
-            { name: 'توت فرنگی', category: 'میوه', cal: 32, p: 0.7, c: 7.7, f: 0.3 },
-            { name: 'گیلاس / آلبالو', category: 'میوه', cal: 50, p: 1, c: 12, f: 0.3 },
-            { name: 'هلو / شلیل', category: 'میوه', cal: 39, p: 0.9, c: 10, f: 0.3 },
-            { name: 'زردآلو', category: 'میوه', cal: 48, p: 1.4, c: 11, f: 0.4 },
-            { name: 'انار', category: 'میوه', cal: 83, p: 1.7, c: 19, f: 1.2 },
-            { name: 'کیوی', category: 'میوه', cal: 61, p: 1.1, c: 15, f: 0.5 },
-            { name: 'انجیر', category: 'میوه', cal: 74, p: 0.8, c: 19, f: 0.3 },
-            // سبزیجات
-            { name: 'کاهو', category: 'سبزیجات', cal: 15, p: 1.4, c: 2.9, f: 0.2 },
-            { name: 'اسفناج', category: 'سبزیجات', cal: 23, p: 2.9, c: 3.6, f: 0.4 },
-            { name: 'کلم بروكلی', category: 'سبزیجات', cal: 34, p: 2.8, c: 7, f: 0.4 },
-            { name: 'هویج', category: 'سبزیجات', cal: 41, p: 0.9, c: 10, f: 0.2 },
-            { name: 'سیب زمینی پخته', category: 'سبزیجات', cal: 87, p: 1.9, c: 20, f: 0.1 },
-            { name: 'پیاز', category: 'سبزیجات', cal: 40, p: 1.1, c: 9, f: 0.1 },
-            { name: 'قارچ', category: 'سبزیجات', cal: 22, p: 3.1, c: 3.3, f: 0.3 },
-            { name: 'بادنجان', category: 'سبزیجات', cal: 25, p: 1, c: 6, f: 0.2 },
-            { name: 'کدو سبز', category: 'سبزیجات', cal: 17, p: 1.2, c: 3.1, f: 0.3 },
-            { name: 'فلفل دلمه‌ای', category: 'سبزیجات', cal: 20, p: 0.9, c: 4.6, f: 0.2 },
-            // غذاهای سنتی اصلی
-            { name: 'زرشک پلو با مرغ', category: 'غذا', cal: 195, p: 11, c: 22, f: 6 },
-            { name: 'چلو کباب کوبیده', category: 'غذا', cal: 240, p: 14, c: 18, f: 12 },
-            { name: 'چلو جوجه کباب', category: 'غذا', cal: 180, p: 16, c: 16, f: 5 },
-            { name: 'خورشت قرمه سبزی با برنج', category: 'غذا', cal: 175, p: 6, c: 20, f: 8 },
-            { name: 'سینه مرغ کباب شده', category: 'پروتئین', cal: 165, p: 31, c: 0, f: 3.6 },
-            { name: 'برنج کته پخته', category: 'غلات', cal: 130, p: 2.7, c: 28, f: 0.3 },
-            { name: 'تخم مرغ آب‌پز', category: 'پروتئین', cal: 155, p: 12.6, c: 1.1, f: 10.6 }
-        ];
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+                .replace(/آ/g, 'ا').replace(/أ/g, 'ا')
+                .replace(/إ/g, 'ا').replace(/ۀ/g, 'ه')
+                .trim();
+        }
 
-        // دیتابیس کامل ورزش‌ها
-        const localWorkouts = [
-            { name: 'دویدن با سرعت بالا', calPerMin: 12, category: 'هوازی' },
-            { name: 'دویدن با سرعت متوسط', calPerMin: 10, category: 'هوازی' },
-            { name: 'دویدن درجا / نرمش', calPerMin: 7, category: 'هوازی' },
-            { name: 'پیاده‌روی سریع', calPerMin: 5, category: 'هوازی' },
-            { name: 'پیاده‌روی معمولی', calPerMin: 3.5, category: 'هوازی' },
-            { name: 'تمرین با وزنه (بدنسازی)', calPerMin: 6, category: 'قدرتی' },
-            { name: 'شنا کردن', calPerMin: 8.5, category: 'هوازی' },
-            { name: 'دوچرخه‌سواری', calPerMin: 7, category: 'هوازی' },
-            { name: 'طناب زدن', calPerMin: 11, category: 'هوازی' },
-            { name: 'فوتبال', calPerMin: 9, category: 'ورزشی' },
-            { name: 'بسکتبال', calPerMin: 8, category: 'ورزشی' },
-            { name: 'والیبال', calPerMin: 5, category: 'ورزشی' },
-            { name: 'یوگا / کششی', calPerMin: 3, category: 'سبک' },
-            { name: 'ایروبیک / زومبا', calPerMin: 8, category: 'هوازی' }
-        ];
+        // آرایه‌های دیتابیس (در مراحل بعد کامل پر می‌شوند)
+        let localFoodsPart1 = [];
+        let localFoodsPart2 = [];
+        let localWorkoutsList = [];
+        let allFoods = [];
 
-        let searchTimer;
         let userState = JSON.parse(localStorage.getItem('cal_user_state')) || null;
         let todayData = JSON.parse(localStorage.getItem('cal_today_data')) || { consumed: 0, burned: 0, water: 0 };
         let selectedItemForAdd = null;
         let isWorkoutMode = false;
+
+        function combineDatabase() {
+            allFoods = [...localFoodsPart1, ...localFoodsPart2];
+            document.getElementById('food-count-notice').innerText = `بانک اطلاعاتی فعال شامل ${allFoods.length} آیتم غذایی است.`;
+            renderLocalFoods(allFoods);
+        }
 
         function initApp() {
             if (!userState) {
@@ -266,15 +228,23 @@
                 calculateTDEE();
                 updateDashboard();
             }
-            renderLocalFoods(localFoods);
+            combineDatabase();
             renderWorkouts();
         }
 
         function calculateTDEE() {
             if (!userState) return 2000;
-            const { gender, age, weight, height, activity } = userState;
+            const gender = userState.gender || 'male';
+            const age = parseFloat(userState.age) || 25;
+            const weight = parseFloat(userState.weight) || 70;
+            const height = parseFloat(userState.height) || 175;
+            const activity = parseFloat(userState.activity) || 1.2;
+
             let bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
-            let tdee = Math.round(bmr * parseFloat(activity));
+            let tdee = Math.round(bmr * activity);
+
+            if (isNaN(tdee) || tdee <= 0) tdee = 2000;
+
             userState.tdee = tdee;
             localStorage.setItem('cal_user_state', JSON.stringify(userState));
             return tdee;
@@ -283,9 +253,9 @@
         function submitOnboarding() {
             userState = {
                 gender: document.getElementById('init-gender').value,
-                age: parseInt(document.getElementById('init-age').value),
-                height: parseFloat(document.getElementById('init-height').value),
-                weight: parseFloat(document.getElementById('init-weight').value),
+                age: parseFloat(document.getElementById('init-age').value) || 25,
+                height: parseFloat(document.getElementById('init-height').value) || 175,
+                weight: parseFloat(document.getElementById('init-weight').value) || 70,
                 activity: document.getElementById('init-activity').value
             };
             calculateTDEE();
@@ -294,29 +264,44 @@
             updateDashboard();
         }
 
+        function saveProfileFromSettings() {
+            userState = {
+                gender: document.getElementById('user-gender').value,
+                age: parseFloat(document.getElementById('user-age').value) || 25,
+                height: parseFloat(document.getElementById('user-height').value) || 175,
+                weight: parseFloat(document.getElementById('user-weight').value) || 70,
+                activity: document.getElementById('user-activity').value
+            };
+            calculateTDEE();
+            updateDashboard();
+            alert('پروفایل بروزرسانی شد.');
+        }
+
         function updateProfileInputs() {
             if (!userState) return;
-            document.getElementById('user-gender').value = userState.gender;
-            document.getElementById('user-age').value = userState.age;
-            document.getElementById('user-height').value = userState.height;
-            document.getElementById('user-weight').value = userState.weight;
-            document.getElementById('user-activity').value = userState.activity;
+            document.getElementById('user-gender').value = userState.gender || 'male';
+            document.getElementById('user-age').value = userState.age || 25;
+            document.getElementById('user-height').value = userState.height || 175;
+            document.getElementById('user-weight').value = userState.weight || 70;
+            document.getElementById('user-activity').value = userState.activity || '1.2';
         }
 
         function updateDashboard() {
-            const target = userState ? userState.tdee : 2000;
-            const remaining = target - todayData.consumed + todayData.burned;
+            const target = (userState && userState.tdee && !isNaN(userState.tdee)) ? userState.tdee : 2000;
+            const consumed = parseFloat(todayData.consumed) || 0;
+            const burned = parseFloat(todayData.burned) || 0;
+            const remaining = target - consumed + burned;
             
-            document.getElementById('consumed-cal').innerText = todayData.consumed;
-            document.getElementById('burned-cal').innerText = todayData.burned;
-            document.getElementById('remaining-cal').innerText = remaining;
-            document.getElementById('water-count').innerText = `${todayData.water} از 8 لیوان 💧`;
+            document.getElementById('consumed-cal').innerText = consumed;
+            document.getElementById('burned-cal').innerText = burned;
+            document.getElementById('remaining-cal').innerText = isNaN(remaining) ? 2000 : remaining;
+            document.getElementById('water-count').innerText = `${todayData.water || 0} از 8 لیوان 💧`;
 
             localStorage.setItem('cal_today_data', JSON.stringify(todayData));
         }
 
         function addWater(val) {
-            todayData.water = Math.max(0, todayData.water + val);
+            todayData.water = Math.max(0, (todayData.water || 0) + val);
             updateDashboard();
         }
 
@@ -327,10 +312,9 @@
             el.classList.add('active');
         }
 
-        // نمایش خوراکی‌های محلی
         function renderLocalFoods(list) {
             const listEl = document.getElementById('food-list');
-            if (list.length === 0) {
+            if (!list || list.length === 0) {
                 listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">موردی یافت نشد</p>';
                 return;
             }
@@ -346,54 +330,1604 @@
             `).join('');
         }
 
-        // مدیریت جستجوی همزمان (آفلاین + آنلاین)
         function handleFoodSearch() {
-            const query = document.getElementById('food-search').value.trim().toLowerCase();
+            const query = normalizeText(document.getElementById('food-search').value);
             if (!query) {
-                renderLocalFoods(localFoods);
+                renderLocalFoods(allFoods);
+                return;
+            }
+            const filtered = allFoods.filter(f => normalizeText(f.name).includes(query));
+            renderLocalFoods(filtered);
+        }
+
+        function renderWorkouts() {
+            const query = normalizeText(document.getElementById('workout-search').value);
+            const listEl = document.getElementById('workout-list');
+            
+            const filtered = localWorkoutsList.filter(w => normalizeText(w.name).includes(query));
+            if(filtered.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">موردی یافت نشد</p>';
                 return;
             }
 
-            const filteredLocal = localFoods.filter(f => f.name.toLowerCase().includes(query));
-            renderLocalFoods(filteredLocal);
-
-            // اگر در آفلاین کم بود یا کاربر کلمه جدیدی زد، سرچ آنلاین اجرا می‌شود
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => searchFoodsOnline(query), 600);
+            listEl.innerHTML = filtered.map(w => `
+                <div class="item-card" onclick='openModalWithData("${w.name}", ${w.calPerMin}, true)'>
+                    <div class="item-info">
+                        <div class="name">${w.name}</div>
+                        <div class="details">دسته: ${w.category}</div>
+                    </div>
+                    <div class="item-value burn">${w.calPerMin} کالری/دقیقه</div>
+                </div>
+            `).join('');
         }
 
-        async function searchFoodsOnline(query) {
-            if (query.length < 2) return;
+        function openModalWithData(name, val, workout) {
+            isWorkoutMode = workout;
+            selectedItemForAdd = { name, val };
+            if(workout) {
+                document.getElementById('modal-item-title').innerText = `ثبت فعالیت: ${name}`;
+                document.getElementById('modal-item-unit-label').innerText = 'مدت زمان فعالیت (دقیقه)';
+                document.getElementById('modal-item-amount').value = 30;
+            } else {
+                document.getElementById('modal-item-title').innerText = `ثبت خوراکی: ${name}`;
+                document.getElementById('modal-item-unit-label').innerText = 'مقدار مصرفی (گرم)';
+                document.getElementById('modal-item-amount').value = 100;
+            }
+            document.getElementById('modal-item').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function confirmAddItem() {
+            const amount = parseFloat(document.getElementById('modal-item-amount').value) || 0;
+            if(amount <= 0) return;
+
+            if(isWorkoutMode) {
+                const burned = Math.round(selectedItemForAdd.val * amount);
+                todayData.burned += burned;
+                alert(`${burned} کالری سوزانده شده ثبت شد.`);
+            } else {
+                const consumed = Math.round((selectedItemForAdd.val / 100) * amount);
+                todayData.consumed += consumed;
+                alert(`${consumed} کالری دریافت شده ثبت شد.`);
+            }
+
+            updateDashboard();
+            closeModal('modal-item');
+            switchTab('dashboard', document.querySelectorAll('.nav-item')[0]);
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>کالری‌شمار هوشمند آنلاین و آفلاین</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 75px; direction: rtl; }
+
+        header { padding: 16px; background: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
+        .header-title h1 { font-size: 1.1rem; }
+        .header-title span { font-size: 0.8rem; color: var(--text-sub); }
+        .app-icon { width: 38px; height: 38px; background: #064e3b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid var(--accent-green); }
+
+        .container { padding: 16px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--card-border); }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; text-align: center; }
+        .summary-box { background: #0f172a; padding: 12px 8px; border-radius: 12px; }
+        .summary-box .val { font-size: 1.1rem; font-weight: bold; color: var(--accent-green); }
+        .summary-box .val.burned { color: var(--accent-red); }
+        .summary-box .lbl { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .online-notice { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); border-radius: 10px; padding: 10px; font-size: 0.8rem; color: var(--accent-green); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .search-box { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem; outline: none; }
+        
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--card-border); cursor: pointer; }
+        .item-card:active { background: #1e293b; }
+        .item-info .name { font-weight: bold; font-size: 0.95rem; }
+        .item-info .details { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
+        .item-value { color: var(--accent-green); font-weight: bold; font-size: 0.9rem; }
+        .item-value.burn { color: var(--accent-red); }
+        .badge-online { background: #0284c7; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #1e293b; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--card-border); }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-item .icon { font-size: 1.2rem; display: block; }
+        
+        .btn-submit { width: 100%; padding: 12px; background: var(--accent-green); border: none; border-radius: 10px; color: #000; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; }
+
+        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--card-border); }
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>کالری‌شمار هوشمند</h1>
+            <span id="current-date">امروز</span>
+        </div>
+        <div class="app-icon">🍏</div>
+    </header>
+
+    <div class="container">
+        <!-- داشبورد -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="card">
+                <h3>خلاصه انرژی امروز</h3>
+                <div class="summary-grid">
+                    <div class="summary-box"><div class="val" id="consumed-cal">0</div><div class="lbl">دریافتی</div></div>
+                    <div class="summary-box"><div class="val" id="remaining-cal">2000</div><div class="lbl">باقیمانده</div></div>
+                    <div class="summary-box"><div class="val burned" id="burned-cal">0</div><div class="lbl">سوخته شده</div></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>مصرف آب امروز</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <span id="water-count" style="font-size:1.1rem; font-weight:bold;">0 از 8 لیوان 💧</span>
+                    <div>
+                        <button onclick="addWater(1)" style="padding:6px 12px; background:var(--accent-green); border:none; border-radius:6px; font-weight:bold;">+ افزودن</button>
+                        <button onclick="addWater(-1)" style="padding:6px 12px; background:var(--card-border); border:none; border-radius:6px; color:#fff;">- کاهش</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- خوراکی‌ها -->
+        <div id="tab-foods" class="tab-content">
+            <div class="online-notice">
+                <span>🌐</span>
+                <span id="food-count-notice">جستجوی هوشمند آفلاین و آنلاین فعال است.</span>
+            </div>
+            <input type="text" id="food-search" class="search-box" placeholder="جستجوی غذا (قرمه سبزی، کباب، پیتزا، بوقلمون)..." oninput="handleFoodSearch()">
+            <div id="food-list"></div>
+        </div>
+
+        <!-- کالری سوزی (ورزش) -->
+        <div id="tab-burn" class="tab-content">
+            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی ورزش (بوکس، شنا، دویدن)..." oninput="renderWorkouts()">
+            <div id="workout-list"></div>
+        </div>
+
+        <!-- آمار -->
+        <div id="tab-stats" class="tab-content">
+            <div class="card">
+                <h3>روند مصرف کالری</h3>
+                <div style="text-align:center; padding: 20px 0; color: var(--text-sub);">داده‌های روزانه به صورت اتوماتیک ذخیره می‌شوند.</div>
+            </div>
+        </div>
+
+        <!-- تنظیمات -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h3>پروفایل کاربری</h3>
+                <div class="input-group" style="margin-top:10px;">
+                    <label>جنسیت</label>
+                    <select id="user-gender"><option value="male">مرد</option><option value="female">زن</option></select>
+                </div>
+                <div class="input-group">
+                    <label>سن (سال)</label>
+                    <input type="number" id="user-age" value="25">
+                </div>
+                <div class="input-group">
+                    <label>قد (سانتی‌متر)</label>
+                    <input type="number" id="user-height" value="175">
+                </div>
+                <div class="input-group">
+                    <label>وزن (کیلوگرم)</label>
+                    <input type="number" id="user-weight" value="70">
+                </div>
+                <div class="input-group">
+                    <label>میزان فعالیت روزانه</label>
+                    <select id="user-activity">
+                        <option value="1.2">کم (نشسته / بدون ورزش)</option>
+                        <option value="1.375">متوسط (۱ تا ۳ جلسه ورزش در هفته)</option>
+                        <option value="1.55">زیاد (۳ تا ۵ جلسه ورزش در هفته)</option>
+                    </select>
+                </div>
+                <button class="btn-submit" onclick="saveProfileFromSettings()">بروزرسانی پروفایل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال‌ها -->
+    <div id="modal-onboarding" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">خوش آمدید! مشخصات خود را وارد کنید</div>
+            <div class="input-group"><label>جنسیت</label><select id="init-gender"><option value="male">مرد</option><option value="female">زن</option></select></div>
+            <div class="input-group"><label>سن (سال)</label><input type="number" id="init-age" value="25"></div>
+            <div class="input-group"><label>قد (سانتی‌متر)</label><input type="number" id="init-height" value="175"></div>
+            <div class="input-group"><label>وزن (کیلوگرم)</label><input type="number" id="init-weight" value="70"></div>
+            <div class="input-group">
+                <label>میزان فعالیت</label>
+                <select id="init-activity">
+                    <option value="1.2">کم (نشسته)</option>
+                    <option value="1.375">متوسط</option>
+                    <option value="1.55">زیاد</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="submitOnboarding()">محاسبه کالری و ورود</button>
+        </div>
+    </div>
+
+    <div id="modal-item" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-item-title">ثبت آیتم</div>
+            <div class="input-group">
+                <label id="modal-item-unit-label">مقدار (گرم / دقیقه)</label>
+                <input type="number" id="modal-item-amount" value="100">
+            </div>
+            <button class="btn-submit" onclick="confirmAddItem()">ثبت در برنامه امروز</button>
+            <button class="btn-submit" style="background:var(--card-border); color:#fff; margin-top:5px;" onclick="closeModal('modal-item')">انصراف</button>
+        </div>
+    </div>
+
+    <!-- ناوبری -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('dashboard', this)"><span class="icon">📊</span>داشبورد</div>
+        <div class="nav-item" onclick="switchTab('foods', this)"><span class="icon">🥗</span>خوراکی‌ها</div>
+        <div class="nav-item" onclick="switchTab('burn', this)"><span class="icon">🔥</span>کالری‌سوزی</div>
+        <div class="nav-item" onclick="switchTab('stats', this)"><span class="icon">📈</span>آمار</div>
+        <div class="nav-item" onclick="switchTab('settings', this)"><span class="icon">⚙️</span>تنظیمات</div>
+    </nav>
+
+    <script>
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+                .replace(/آ/g, 'ا').replace(/أ/g, 'ا')
+                .replace(/إ/g, 'ا').replace(/ۀ/g, 'ه')
+                .trim();
+        }
+
+        // بخش اول دیتابیس عظیم خوراکی‌های سنتی و ایرانی
+        let localFoodsPart1 = [
+            { name: 'چلو کباب کوبیده', category: 'غذا سنتی', cal: 240, p: 14, c: 18, f: 12 },
+            { name: 'چلو جوجه کباب زعفرانی', category: 'غذا سنتی', cal: 180, p: 16, c: 16, f: 5 },
+            { name: 'چلو کباب برگ', category: 'غذا سنتی', cal: 200, p: 18, c: 15, f: 7 },
+            { name: 'چلو کباب سلطانی', category: 'غذا سنتی', cal: 230, p: 19, c: 15, f: 10 },
+            { name: 'چلو کباب بختیاری', category: 'غذا سنتی', cal: 210, p: 17, c: 15, f: 8 },
+            { name: 'چلو کباب چنجه', category: 'غذا سنتی', cal: 220, p: 18, c: 15, f: 9 },
+            { name: 'چلو کباب ششلیک', category: 'غذا سنتی', cal: 250, p: 17, c: 14, f: 14 },
+            { name: 'چلو ماهیچه گوسفندی', category: 'غذا سنتی', cal: 220, p: 16, c: 14, f: 10 },
+            { name: 'خورشت قرمه سبزی با برنج', category: 'خورشت', cal: 175, p: 6, c: 20, f: 8 },
+            { name: 'خورشت قیمه سیب زمینی با برنج', category: 'خورشت', cal: 185, p: 7, c: 22, f: 8 },
+            { name: 'خورشت قیمه بادمجان با برنج', category: 'خورشت', cal: 190, p: 6.5, c: 21, f: 9 },
+            { name: 'خورشت فسنجان با مرغ و برنج', category: 'خورشت', cal: 260, p: 8, c: 20, f: 16 },
+            { name: 'خورشت کرفس با برنج', category: 'خورشت', cal: 160, p: 5.5, c: 19, f: 7 },
+            { name: 'خورشت بامیه با برنج', category: 'خورشت', cal: 155, p: 5, c: 20, f: 6 },
+            { name: 'خورشت ریواس با برنج', category: 'خورشت', cal: 150, p: 4.5, c: 19, f: 6 },
+            { name: 'خورشت کنگر با برنج', category: 'خورشت', cal: 155, p: 5, c: 19, f: 6.5 },
+            { name: 'خورشت به آلو با برنج', category: 'خورشت', cal: 170, p: 4, c: 24, f: 6 },
+            { name: 'خورشت هویج تبریزی با برنج', category: 'خورشت', cal: 180, p: 5, c: 23, f: 7 },
+            { name: 'خورشت قلیه ماهی با برنج', category: 'خورشت', cal: 165, p: 10, c: 18, f: 5.5 },
+            { name: 'خورشت قلیه میگو با برنج', category: 'خورشت', cal: 160, p: 11, c: 18, f: 4.5 },
+            { name: 'زرشک پلو با مرغ', category: 'پلو', cal: 195, p: 11, c: 22, f: 6 },
+            { name: 'باقالی پلو با ماهیچه', category: 'پلو', cal: 210, p: 12, c: 22, f: 8 },
+            { name: 'باقالی پلو با مرغ', category: 'پلو', cal: 190, p: 11, c: 22, f: 6 },
+            { name: 'عدس پلو با گوشت چرخ‌کرده', category: 'پلو', cal: 175, p: 7, c: 26, f: 4 },
+            { name: 'عدس پلو ساده با کشمش', category: 'پلو', cal: 160, p: 5, c: 29, f: 2.5 },
+            { name: 'لوبیا پلو با گوشت تکه‌ای', category: 'پلو', cal: 180, p: 7, c: 25, f: 5 },
+            { name: 'استانبولی پلو با سیب زمینی', category: 'پلو', cal: 165, p: 3.5, c: 28, f: 4 },
+            { name: 'آلبالو پلو با مرغ', category: 'پلو', cal: 205, p: 8, c: 30, f: 5 },
+            { name: 'کلم پلو شیرازی', category: 'پلو', cal: 170, p: 6, c: 24, f: 5 },
+            { name: 'شیرین پلو با مرغ', category: 'پلو', cal: 210, p: 8, c: 32, f: 5.5 },
+            { name: 'مرصع پلو با مرغ', category: 'پلو', cal: 215, p: 9, c: 31, f: 6 },
+            { name: 'ته چین مرغ زعفرانی', category: 'پلو', cal: 210, p: 10, c: 25, f: 8 },
+            { name: 'ته چین گوشت و بادمجان', category: 'پلو', cal: 230, p: 11, c: 24, f: 10 },
+            { name: 'آبگوشت / دیزی سنتی', category: 'سنتی', cal: 210, p: 12, c: 15, f: 11 },
+            { name: 'آش رشته با کشک و پیازداغ', category: 'آش', cal: 140, p: 5, c: 20, f: 4 },
+            { name: 'آش دوغ اردبیل', category: 'آش', cal: 110, p: 4, c: 16, f: 3 },
+            { name: 'آش شله قلمکار', category: 'آش', cal: 160, p: 7, c: 22, f: 5 },
+            { name: 'آش جو', category: 'آش', cal: 130, p: 4.5, c: 21, f: 3 },
+            { name: 'آش شلمشور / گوجه', category: 'آش', cal: 105, p: 3.5, c: 18, f: 2 },
+            { name: 'حلیم گندم با گوشت بوقلمون/گوسفند', category: 'سنتی', cal: 170, p: 8, c: 22, f: 5 },
+            { name: 'کله پاچه (مخلوط گوشت و بناگوش)', category: 'سنتی', cal: 310, p: 18, c: 0, f: 26 },
+            { name: 'میرزا قاسمی گیلانی', category: 'غذای شمالی', cal: 120, p: 4, c: 8, f: 8 },
+            { name: 'کشک بادمجان', category: 'سنتی', cal: 165, p: 5, c: 10, f: 12 },
+            { name: 'کوکو سبزی با گردو و زرشک', category: 'کوکو', cal: 190, p: 6, c: 8, f: 15 },
+            { name: 'کوکو سیب زمینی', category: 'کوکو', cal: 210, p: 4, c: 22, f: 12 },
+            { name: 'کتلت گوشت مامان‌پز', category: 'سنتی', cal: 240, p: 12, c: 14, f: 15 },
+            { name: 'شامی کباب شیرازی', category: 'سنتی', cal: 230, p: 13, c: 12, f: 14 },
+            { name: 'دلمه برگ مو', category: 'دلمه', cal: 145, p: 4, c: 18, f: 6 },
+            { name: 'دلمه فلفل / بادمجان', category: 'دلمه', cal: 135, p: 4.5, c: 16, f: 5 },
+            { name: 'یتیمچه بادمجان', category: 'سنتی', cal: 85, p: 2, c: 10, f: 4 },
+            { name: 'خوراک لوبیا چیتی با قارچ', category: 'خوراک', cal: 110, p: 6, c: 18, f: 1.5 },
+            { name: 'خوراک عدسی سنتی', category: 'خوراک', cal: 115, p: 7, c: 19, f: 1 }
+        ];
+
+        let localFoodsPart2 = [];
+        let localWorkoutsList = [];
+        let allFoods = [];
+
+        let userState = JSON.parse(localStorage.getItem('cal_user_state')) || null;
+        let todayData = JSON.parse(localStorage.getItem('cal_today_data')) || { consumed: 0, burned: 0, water: 0 };
+        let selectedItemForAdd = null;
+        let isWorkoutMode = false;
+        let searchTimeout = null;
+
+        function combineDatabase() {
+            allFoods = [...localFoodsPart1, ...localFoodsPart2];
+            document.getElementById('food-count-notice').innerText = `بانک آفلاین و آنلاین فعال است (${allFoods.length} آیتم داخلی).`;
+            renderLocalFoods(allFoods);
+        }
+
+        function initApp() {
+            if (!userState) {
+                document.getElementById('modal-onboarding').style.display = 'flex';
+            } else {
+                updateProfileInputs();
+                calculateTDEE();
+                updateDashboard();
+            }
+            combineDatabase();
+            renderWorkouts();
+        }
+
+        function calculateTDEE() {
+            if (!userState) return 2000;
+            const gender = userState.gender || 'male';
+            const age = parseFloat(userState.age) || 25;
+            const weight = parseFloat(userState.weight) || 70;
+            const height = parseFloat(userState.height) || 175;
+            const activity = parseFloat(userState.activity) || 1.2;
+
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+            let tdee = Math.round(bmr * activity);
+
+            if (isNaN(tdee) || tdee <= 0) tdee = 2000;
+
+            userState.tdee = tdee;
+            localStorage.setItem('cal_user_state', JSON.stringify(userState));
+            return tdee;
+        }
+
+        function submitOnboarding() {
+            userState = {
+                gender: document.getElementById('init-gender').value,
+                age: parseFloat(document.getElementById('init-age').value) || 25,
+                height: parseFloat(document.getElementById('init-height').value) || 175,
+                weight: parseFloat(document.getElementById('init-weight').value) || 70,
+                activity: document.getElementById('init-activity').value
+            };
+            calculateTDEE();
+            document.getElementById('modal-onboarding').style.display = 'none';
+            updateProfileInputs();
+            updateDashboard();
+        }
+
+        function saveProfileFromSettings() {
+            userState = {
+                gender: document.getElementById('user-gender').value,
+                age: parseFloat(document.getElementById('user-age').value) || 25,
+                height: parseFloat(document.getElementById('user-height').value) || 175,
+                weight: parseFloat(document.getElementById('user-weight').value) || 70,
+                activity: document.getElementById('user-activity').value
+            };
+            calculateTDEE();
+            updateDashboard();
+            alert('پروفایل بروزرسانی شد.');
+        }
+
+        function updateProfileInputs() {
+            if (!userState) return;
+            document.getElementById('user-gender').value = userState.gender || 'male';
+            document.getElementById('user-age').value = userState.age || 25;
+            document.getElementById('user-height').value = userState.height || 175;
+            document.getElementById('user-weight').value = userState.weight || 70;
+            document.getElementById('user-activity').value = userState.activity || '1.2';
+        }
+
+        function updateDashboard() {
+            const target = (userState && userState.tdee && !isNaN(userState.tdee)) ? userState.tdee : 2000;
+            const consumed = parseFloat(todayData.consumed) || 0;
+            const burned = parseFloat(todayData.burned) || 0;
+            const remaining = target - consumed + burned;
+            
+            document.getElementById('consumed-cal').innerText = consumed;
+            document.getElementById('burned-cal').innerText = burned;
+            document.getElementById('remaining-cal').innerText = isNaN(remaining) ? 2000 : remaining;
+            document.getElementById('water-count').innerText = `${todayData.water || 0} از 8 لیوان 💧`;
+
+            localStorage.setItem('cal_today_data', JSON.stringify(todayData));
+        }
+
+        function addWater(val) {
+            todayData.water = Math.max(0, (todayData.water || 0) + val);
+            updateDashboard();
+        }
+
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function renderLocalFoods(list) {
             const listEl = document.getElementById('food-list');
+            if (!list || list.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">در حال جستجوی آنلاین...</p>';
+                return;
+            }
 
+            listEl.innerHTML = list.map(f => `
+                <div class="item-card" onclick='openModalWithData("${f.name}", ${f.cal}, false)'>
+                    <div class="item-info">
+                        <div class="name">${f.isOnline ? '<span class="badge-online">آنلاین</span>' : ''}${f.name}</div>
+                        <div class="details">دسته: ${f.category} | پروتئین: ${f.p}g | کربو: ${f.c}g</div>
+                    </div>
+                    <div class="item-value">${f.cal} کالری</div>
+                </div>
+            `).join('');
+        }
+
+        function handleFoodSearch() {
+            const query = normalizeText(document.getElementById('food-search').value);
+            if (!query) {
+                renderLocalFoods(allFoods);
+                return;
+            }
+
+            const filtered = allFoods.filter(f => normalizeText(f.name).includes(query));
+            renderLocalFoods(filtered);
+
+            // موتور آنلاین: در صورت عدم وجود یا برای تکمیل نتایج
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchOnlineFoods(query, filtered);
+            }, 600);
+        }
+
+        // جستجوی آنلاین متصل به Open Food Facts
+        async function fetchOnlineFoods(query, currentFiltered) {
             try {
-                const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=15`);
+                const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`);
                 const data = await res.json();
-
+                
                 if (data.products && data.products.length > 0) {
-                    const onlineResults = data.products.map(p => ({
-                        name: p.product_name_fa || p.product_name || query,
-                        category: 'آنلاین',
-                        cal: Math.round(p.nutriments?.['energy-kcal_100g'] || p.nutriments?.['energy-kcal'] || 100),
-                        p: Math.round(p.nutriments?.proteins_100g || 0),
-                        c: Math.round(p.nutriments?.carbohydrates_100g || 0)
-                    }));
+                    const onlineItems = data.products.map(p => {
+                        const nut = p.nutriments || {};
+                        return {
+                            name: p.product_name_fa || p.product_name || query,
+                            category: 'آنلاین جهانی',
+                            cal: Math.round(nut['energy-kcal_100g'] || nut['energy-kcal'] || 150),
+                            p: Math.round(nut.proteins_100g || 0),
+                            c: Math.round(nut.carbohydrates_100g || 0),
+                            f: Math.round(nut.fat_100g || 0),
+                            isOnline: true
+                        };
+                    }).filter(i => i.cal > 0);
 
-                    const filteredLocal = localFoods.filter(f => f.name.toLowerCase().includes(query));
-                    renderLocalFoods([...filteredLocal, ...onlineResults]);
+                    const combined = [...currentFiltered, ...onlineItems];
+                    renderLocalFoods(combined);
                 }
-            } catch (err) {
-                // در صورت قطعی اینترنت، همون نتایج آفلاین باقی می‌مونه
+            } catch(e) {
+                console.log('Online search offline/unreachable');
             }
         }
 
         function renderWorkouts() {
-            const query = document.getElementById('workout-search').value.trim().toLowerCase();
+            const query = normalizeText(document.getElementById('workout-search').value);
             const listEl = document.getElementById('workout-list');
             
-            const filtered = localWorkouts.filter(w => w.name.toLowerCase().includes(query));
+            const filtered = localWorkoutsList.filter(w => normalizeText(w.name).includes(query));
             if(filtered.length === 0) {
-                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">ورزشی یافت نشد</p>';
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">موردی یافت نشد</p>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(w => `
+                <div class="item-card" onclick='openModalWithData("${w.name}", ${w.calPerMin}, true)'>
+                    <div class="item-info">
+                        <div class="name">${w.name}</div>
+                        <div class="details">دسته: ${w.category}</div>
+                    </div>
+                    <div class="item-value burn">${w.calPerMin} کالری/دقیقه</div>
+                </div>
+            `).join('');
+        }
+
+        function openModalWithData(name, val, workout) {
+            isWorkoutMode = workout;
+            selectedItemForAdd = { name, val };
+            if(workout) {
+                document.getElementById('modal-item-title').innerText = `ثبت فعالیت: ${name}`;
+                document.getElementById('modal-item-unit-label').innerText = 'مدت زمان فعالیت (دقیقه)';
+                document.getElementById('modal-item-amount').value = 30;
+            } else {
+                document.getElementById('modal-item-title').innerText = `ثبت خوراکی: ${name}`;
+                document.getElementById('modal-item-unit-label').innerText = 'مقدار مصرفی (گرم)';
+                document.getElementById('modal-item-amount').value = 100;
+            }
+            document.getElementById('modal-item').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function confirmAddItem() {
+            const amount = parseFloat(document.getElementById('modal-item-amount').value) || 0;
+            if(amount <= 0) return;
+
+            if(isWorkoutMode) {
+                const burned = Math.round(selectedItemForAdd.val * amount);
+                todayData.burned += burned;
+                alert(`${burned} کالری سوزانده شده ثبت شد.`);
+            } else {
+                const consumed = Math.round((selectedItemForAdd.val / 100) * amount);
+                todayData.consumed += consumed;
+                alert(`${consumed} کالری دریافت شده ثبت شد.`);
+            }
+
+            updateDashboard();
+            closeModal('modal-item');
+            switchTab('dashboard', document.querySelectorAll('.nav-item')[0]);
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>کالری‌شمار هوشمند آنلاین و آفلاین</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 75px; direction: rtl; }
+
+        header { padding: 16px; background: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
+        .header-title h1 { font-size: 1.1rem; }
+        .header-title span { font-size: 0.8rem; color: var(--text-sub); }
+        .app-icon { width: 38px; height: 38px; background: #064e3b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid var(--accent-green); }
+
+        .container { padding: 16px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--card-border); }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; text-align: center; }
+        .summary-box { background: #0f172a; padding: 12px 8px; border-radius: 12px; }
+        .summary-box .val { font-size: 1.1rem; font-weight: bold; color: var(--accent-green); }
+        .summary-box .val.burned { color: var(--accent-red); }
+        .summary-box .lbl { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .online-notice { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); border-radius: 10px; padding: 10px; font-size: 0.8rem; color: var(--accent-green); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .search-box { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem; outline: none; }
+        
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--card-border); cursor: pointer; }
+        .item-card:active { background: #1e293b; }
+        .item-info .name { font-weight: bold; font-size: 0.95rem; }
+        .item-info .details { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
+        .item-value { color: var(--accent-green); font-weight: bold; font-size: 0.9rem; }
+        .item-value.burn { color: var(--accent-red); }
+        .badge-online { background: #0284c7; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #1e293b; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--card-border); }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-item .icon { font-size: 1.2rem; display: block; }
+        
+        .btn-submit { width: 100%; padding: 12px; background: var(--accent-green); border: none; border-radius: 10px; color: #000; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; }
+
+        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--card-border); }
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>کالری‌شمار هوشمند</h1>
+            <span id="current-date">امروز</span>
+        </div>
+        <div class="app-icon">🍏</div>
+    </header>
+
+    <div class="container">
+        <!-- داشبورد -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="card">
+                <h3>خلاصه انرژی امروز</h3>
+                <div class="summary-grid">
+                    <div class="summary-box"><div class="val" id="consumed-cal">0</div><div class="lbl">دریافتی</div></div>
+                    <div class="summary-box"><div class="val" id="remaining-cal">2000</div><div class="lbl">باقیمانده</div></div>
+                    <div class="summary-box"><div class="val burned" id="burned-cal">0</div><div class="lbl">سوخته شده</div></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>مصرف آب امروز</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <span id="water-count" style="font-size:1.1rem; font-weight:bold;">0 از 8 لیوان 💧</span>
+                    <div>
+                        <button onclick="addWater(1)" style="padding:6px 12px; background:var(--accent-green); border:none; border-radius:6px; font-weight:bold;">+ افزودن</button>
+                        <button onclick="addWater(-1)" style="padding:6px 12px; background:var(--card-border); border:none; border-radius:6px; color:#fff;">- کاهش</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- خوراکی‌ها -->
+        <div id="tab-foods" class="tab-content">
+            <div class="online-notice">
+                <span>🌐</span>
+                <span id="food-count-notice">جستجوی هوشمند آفلاین و آنلاین فعال است.</span>
+            </div>
+            <input type="text" id="food-search" class="search-box" placeholder="جستجوی غذا و میوه (سیب، موز، پیتزا، پسته)..." oninput="handleFoodSearch()">
+            <div id="food-list"></div>
+        </div>
+
+        <!-- کالری سوزی (ورزش) -->
+        <div id="tab-burn" class="tab-content">
+            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی ورزش (بوکس، شنا، دویدن)..." oninput="renderWorkouts()">
+            <div id="workout-list"></div>
+        </div>
+
+        <!-- آمار -->
+        <div id="tab-stats" class="tab-content">
+            <div class="card">
+                <h3>روند مصرف کالری</h3>
+                <div style="text-align:center; padding: 20px 0; color: var(--text-sub);">داده‌های روزانه به صورت اتوماتیک ذخیره می‌شوند.</div>
+            </div>
+        </div>
+
+        <!-- تنظیمات -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h3>پروفایل کاربری</h3>
+                <div class="input-group" style="margin-top:10px;">
+                    <label>جنسیت</label>
+                    <select id="user-gender"><option value="male">مرد</option><option value="female">زن</option></select>
+                </div>
+                <div class="input-group">
+                    <label>سن (سال)</label>
+                    <input type="number" id="user-age" value="25">
+                </div>
+                <div class="input-group">
+                    <label>قد (سانتی‌متر)</label>
+                    <input type="number" id="user-height" value="175">
+                </div>
+                <div class="input-group">
+                    <label>وزن (کیلوگرم)</label>
+                    <input type="number" id="user-weight" value="70">
+                </div>
+                <div class="input-group">
+                    <label>میزان فعالیت روزانه</label>
+                    <select id="user-activity">
+                        <option value="1.2">کم (نشسته / بدون ورزش)</option>
+                        <option value="1.375">متوسط (۱ تا ۳ جلسه ورزش در هفته)</option>
+                        <option value="1.55">زیاد (۳ تا ۵ جلسه ورزش در هفته)</option>
+                    </select>
+                </div>
+                <button class="btn-submit" onclick="saveProfileFromSettings()">بروزرسانی پروفایل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال‌ها -->
+    <div id="modal-onboarding" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">خوش آمدید! مشخصات خود را وارد کنید</div>
+            <div class="input-group"><label>جنسیت</label><select id="init-gender"><option value="male">مرد</option><option value="female">زن</option></select></div>
+            <div class="input-group"><label>سن (سال)</label><input type="number" id="init-age" value="25"></div>
+            <div class="input-group"><label>قد (سانتی‌متر)</label><input type="number" id="init-height" value="175"></div>
+            <div class="input-group"><label>وزن (کیلوگرم)</label><input type="number" id="init-weight" value="70"></div>
+            <div class="input-group">
+                <label>میزان فعالیت</label>
+                <select id="init-activity">
+                    <option value="1.2">کم (نشسته)</option>
+                    <option value="1.375">متوسط</option>
+                    <option value="1.55">زیاد</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="submitOnboarding()">محاسبه کالری و ورود</button>
+        </div>
+    </div>
+
+    <div id="modal-item" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-item-title">ثبت آیتم</div>
+            <div class="input-group">
+                <label id="modal-item-unit-label">مقدار (گرم / دقیقه)</label>
+                <input type="number" id="modal-item-amount" value="100">
+            </div>
+            <button class="btn-submit" onclick="confirmAddItem()">ثبت در برنامه امروز</button>
+            <button class="btn-submit" style="background:var(--card-border); color:#fff; margin-top:5px;" onclick="closeModal('modal-item')">انصراف</button>
+        </div>
+    </div>
+
+    <!-- ناوبری -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('dashboard', this)"><span class="icon">📊</span>داشبورد</div>
+        <div class="nav-item" onclick="switchTab('foods', this)"><span class="icon">🥗</span>خوراکی‌ها</div>
+        <div class="nav-item" onclick="switchTab('burn', this)"><span class="icon">🔥</span>کالری‌سوزی</div>
+        <div class="nav-item" onclick="switchTab('stats', this)"><span class="icon">📈</span>آمار</div>
+        <div class="nav-item" onclick="switchTab('settings', this)"><span class="icon">⚙️</span>تنظیمات</div>
+    </nav>
+
+    <script>
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+                .replace(/آ/g, 'ا').replace(/أ/g, 'ا')
+                .replace(/إ/g, 'ا').replace(/ۀ/g, 'ه')
+                .trim();
+        }
+
+        // بخش اول دیتابیس (غذاهای سنتی)
+        let localFoodsPart1 = [
+            { name: 'چلو کباب کوبیده', category: 'غذا سنتی', cal: 240, p: 14, c: 18, f: 12 },
+            { name: 'چلو جوجه کباب زعفرانی', category: 'غذا سنتی', cal: 180, p: 16, c: 16, f: 5 },
+            { name: 'چلو کباب برگ', category: 'غذا سنتی', cal: 200, p: 18, c: 15, f: 7 },
+            { name: 'چلو کباب سلطانی', category: 'غذا سنتی', cal: 230, p: 19, c: 15, f: 10 },
+            { name: 'چلو کباب بختیاری', category: 'غذا سنتی', cal: 210, p: 17, c: 15, f: 8 },
+            { name: 'چلو کباب چنجه', category: 'غذا سنتی', cal: 220, p: 18, c: 15, f: 9 },
+            { name: 'چلو کباب ششلیک', category: 'غذا سنتی', cal: 250, p: 17, c: 14, f: 14 },
+            { name: 'چلو ماهیچه گوسفندی', category: 'غذا سنتی', cal: 220, p: 16, c: 14, f: 10 },
+            { name: 'خورشت قرمه سبزی با برنج', category: 'خورشت', cal: 175, p: 6, c: 20, f: 8 },
+            { name: 'خورشت قیمه سیب زمینی با برنج', category: 'خورشت', cal: 185, p: 7, c: 22, f: 8 },
+            { name: 'خورشت قیمه بادمجان با برنج', category: 'خورشت', cal: 190, p: 6.5, c: 21, f: 9 },
+            { name: 'خورشت فسنجان با مرغ و برنج', category: 'خورشت', cal: 260, p: 8, c: 20, f: 16 },
+            { name: 'خورشت کرفس با برنج', category: 'خورشت', cal: 160, p: 5.5, c: 19, f: 7 },
+            { name: 'خورشت بامیه با برنج', category: 'خورشت', cal: 155, p: 5, c: 20, f: 6 },
+            { name: 'خورشت ریواس با برنج', category: 'خورشت', cal: 150, p: 4.5, c: 19, f: 6 },
+            { name: 'خورشت کنگر با برنج', category: 'خورشت', cal: 155, p: 5, c: 19, f: 6.5 },
+            { name: 'خورشت به آلو با برنج', category: 'خورشت', cal: 170, p: 4, c: 24, f: 6 },
+            { name: 'خورشت هویج تبریزی با برنج', category: 'خورشت', cal: 180, p: 5, c: 23, f: 7 },
+            { name: 'خورشت قلیه ماهی با برنج', category: 'خورشت', cal: 165, p: 10, c: 18, f: 5.5 },
+            { name: 'خورشت قلیه میگو با برنج', category: 'خورشت', cal: 160, p: 11, c: 18, f: 4.5 },
+            { name: 'زرشک پلو با مرغ', category: 'پلو', cal: 195, p: 11, c: 22, f: 6 },
+            { name: 'باقالی پلو با ماهیچه', category: 'پلو', cal: 210, p: 12, c: 22, f: 8 },
+            { name: 'باقالی پلو با مرغ', category: 'پلو', cal: 190, p: 11, c: 22, f: 6 },
+            { name: 'عدس پلو با گوشت چرخ‌کرده', category: 'پلو', cal: 175, p: 7, c: 26, f: 4 },
+            { name: 'عدس پلو ساده با کشمش', category: 'پلو', cal: 160, p: 5, c: 29, f: 2.5 },
+            { name: 'لوبیا پلو با گوشت تکه‌ای', category: 'پلو', cal: 180, p: 7, c: 25, f: 5 },
+            { name: 'استانبولی پلو با سیب زمینی', category: 'پلو', cal: 165, p: 3.5, c: 28, f: 4 },
+            { name: 'آلبالو پلو با مرغ', category: 'پلو', cal: 205, p: 8, c: 30, f: 5 },
+            { name: 'کلم پلو شیرازی', category: 'پلو', cal: 170, p: 6, c: 24, f: 5 },
+            { name: 'شیرین پلو با مرغ', category: 'پلو', cal: 210, p: 8, c: 32, f: 5.5 },
+            { name: 'مرصع پلو با مرغ', category: 'پلو', cal: 215, p: 9, c: 31, f: 6 },
+            { name: 'ته چین مرغ زعفرانی', category: 'پلو', cal: 210, p: 10, c: 25, f: 8 },
+            { name: 'ته چین گوشت و بادمجان', category: 'پلو', cal: 230, p: 11, c: 24, f: 10 },
+            { name: 'آبگوشت / دیزی سنتی', category: 'سنتی', cal: 210, p: 12, c: 15, f: 11 },
+            { name: 'آش رشته با کشک و پیازداغ', category: 'آش', cal: 140, p: 5, c: 20, f: 4 },
+            { name: 'آش دوغ اردبیل', category: 'آش', cal: 110, p: 4, c: 16, f: 3 },
+            { name: 'آش شله قلمکار', category: 'آش', cal: 160, p: 7, c: 22, f: 5 },
+            { name: 'آش جو', category: 'آش', cal: 130, p: 4.5, c: 21, f: 3 },
+            { name: 'آش شلمشور / گوجه', category: 'آش', cal: 105, p: 3.5, c: 18, f: 2 },
+            { name: 'حلیم گندم با گوشت بوقلمون/گوسفند', category: 'سنتی', cal: 170, p: 8, c: 22, f: 5 },
+            { name: 'کله پاچه (مخلوط گوشت و بناگوش)', category: 'سنتی', cal: 310, p: 18, c: 0, f: 26 },
+            { name: 'میرزا قاسمی گیلانی', category: 'غذای شمالی', cal: 120, p: 4, c: 8, f: 8 },
+            { name: 'کشک بادمجان', category: 'سنتی', cal: 165, p: 5, c: 10, f: 12 },
+            { name: 'کوکو سبزی با گردو و زرشک', category: 'کوکو', cal: 190, p: 6, c: 8, f: 15 },
+            { name: 'کوکو سیب زمینی', category: 'کوکو', cal: 210, p: 4, c: 22, f: 12 },
+            { name: 'کتلت گوشت مامان‌پز', category: 'سنتی', cal: 240, p: 12, c: 14, f: 15 },
+            { name: 'شامی کباب شیرازی', category: 'سنتی', cal: 230, p: 13, c: 12, f: 14 },
+            { name: 'دلمه برگ مو', category: 'دلمه', cal: 145, p: 4, c: 18, f: 6 },
+            { name: 'دلمه فلفل / بادمجان', category: 'دلمه', cal: 135, p: 4.5, c: 16, f: 5 },
+            { name: 'یتیمچه بادمجان', category: 'سنتی', cal: 85, p: 2, c: 10, f: 4 },
+            { name: 'خوراک لوبیا چیتی با قارچ', category: 'خوراک', cal: 110, p: 6, c: 18, f: 1.5 },
+            { name: 'خوراک عدسی سنتی', category: 'خوراک', cal: 115, p: 7, c: 19, f: 1 }
+        ];
+
+        // بخش دوم دیتابیس (میوه‌ها، سبزیجات، فست‌فود، آجیل، غلات و شیرینی)
+        let localFoodsPart2 = [
+            // میوه‌ها
+            { name: 'سیب درختی', category: 'میوه', cal: 52, p: 0.3, c: 14, f: 0.2 },
+            { name: 'موز', category: 'میوه', cal: 89, p: 1.1, c: 23, f: 0.3 },
+            { name: 'پرتقال', category: 'میوه', cal: 47, p: 0.9, c: 12, f: 0.1 },
+            { name: 'خیار', category: 'میوه / سبزی', cal: 15, p: 0.7, c: 3.6, f: 0.1 },
+            { name: 'گوجه فرنگی', category: 'میوه / سبزی', cal: 18, p: 0.9, c: 3.9, f: 0.2 },
+            { name: 'هندوانه', category: 'میوه', cal: 30, p: 0.6, c: 8, f: 0.2 },
+            { name: 'خربزه / طالبی', category: 'میوه', cal: 34, p: 0.8, c: 8.2, f: 0.2 },
+            { name: 'انگور', category: 'میوه', cal: 69, p: 0.7, c: 18, f: 0.2 },
+            { name: 'انار', category: 'میوه', cal: 83, p: 1.7, c: 19, f: 1.2 },
+            { name: 'توت فرنگی', category: 'میوه', cal: 32, p: 0.7, c: 7.7, f: 0.3 },
+            { name: 'گیلاس / آلبالو', category: 'میوه', cal: 50, p: 1, c: 12, f: 0.3 },
+            { name: 'هلو / شلیل', category: 'میوه', cal: 39, p: 0.9, c: 9.5, f: 0.3 },
+            { name: 'زردآلو', category: 'میوه', cal: 48, p: 1.4, c: 11, f: 0.4 },
+            { name: 'انجیر تازه', category: 'میوه', cal: 74, p: 0.8, c: 19, f: 0.3 },
+            { name: 'کیوی', category: 'میوه', cal: 61, p: 1.1, c: 15, f: 0.5 },
+            { name: 'انبه', category: 'میوه', cal: 60, p: 0.8, c: 15, f: 0.4 },
+            { name: 'آناناس', category: 'میوه', cal: 50, p: 0.5, c: 13, f: 0.1 },
+            { name: 'خرما (رطب)', category: 'میوه خشک', cal: 277, p: 1.8, c: 75, f: 0.2 },
+
+            // سبزیجات و صیفی‌جات
+            { name: 'کاهو', category: 'سبزیجات', cal: 15, p: 1.4, c: 2.9, f: 0.2 },
+            { name: 'اسفناج خام', category: 'سبزیجات', cal: 23, p: 2.9, c: 3.6, f: 0.4 },
+            { name: 'کلم بروکلی', category: 'سبزیجات', cal: 34, p: 2.8, c: 7, f: 0.4 },
+            { name: 'هویج', category: 'سبزیجات', cal: 41, p: 0.9, c: 10, f: 0.2 },
+            { name: 'سیب زمینی آب‌پز', category: 'صیفی‌جات', cal: 87, p: 1.9, c: 20, f: 0.1 },
+            { name: 'سیب زمینی سرخ‌کرده', category: 'فست فود', cal: 312, p: 3.4, c: 41, f: 15 },
+            { name: 'قارچ تازه', category: 'سبزیجات', cal: 22, p: 3.1, c: 3.3, f: 0.3 },
+
+            // فست‌فود و غذاهای مدرن
+            { name: 'پیتزا مخلوط / پپرونی', category: 'فست فود', cal: 266, p: 11, c: 30, f: 11 },
+            { name: 'همبرگر ساده', category: 'فست فود', cal: 250, p: 13, c: 24, f: 11 },
+            { name: 'چیزبرگر', category: 'فست فود', cal: 280, p: 15, c: 25, f: 14 },
+            { name: 'ساندویچ کلاپ مرغ', category: 'ساندویچ', cal: 190, p: 12, c: 18, f: 7 },
+            { name: 'ساندویچ فلافل با نان لواش', category: 'ساندویچ', cal: 220, p: 7, c: 32, f: 8 },
+            { name: 'ساندویچ بندری / سوسیس', category: 'ساندویچ', cal: 270, p: 9, c: 25, f: 15 },
+            { name: 'فیله مرغ سوخاری (اسپایسی)', category: 'فست فود', cal: 240, p: 18, c: 12, f: 13 },
+            { name: 'اسنک کالباس و پنیر', category: 'فست فود', cal: 260, p: 10, c: 26, f: 13 },
+
+            // نان، غلات و حبوبات
+            { name: 'نان سنگک', category: 'نان', cal: 259, p: 9, c: 52, f: 1.5 },
+            { name: 'نان بربری', category: 'نان', cal: 265, p: 8.5, c: 54, f: 1.5 },
+            { name: 'نان لواش', category: 'نان', cal: 285, p: 8, c: 58, f: 1.8 },
+            { name: 'نان تافتون', category: 'نان', cal: 270, p: 8.2, c: 55, f: 1.6 },
+            { name: 'نان تست سفید', category: 'نان', cal: 265, p: 9, c: 49, f: 3.2 },
+            { name: 'نان تست جو کامل', category: 'نان', cal: 247, p: 12, c: 41, f: 3.4 },
+            { name: 'برنج کته بدون روغن', category: 'غلات', cal: 130, p: 2.7, c: 28, f: 0.3 },
+            { name: 'برنج زعفرانی با روغن / کره', category: 'غلات', cal: 175, p: 3, c: 30, f: 5 },
+            { name: 'ماکارونی با سویا و رب', category: 'غلات', cal: 150, p: 5, c: 26, f: 3 },
+            { name: 'جو دوسر پرک (اوتمیل)', category: 'غلات', cal: 389, p: 16.9, c: 66, f: 6.9 },
+
+            // پروتئین‌ها و لبنیات
+            { name: 'سینه مرغ کباب شده/آب‌پز', category: 'پروتئین', cal: 165, p: 31, c: 0, f: 3.6 },
+            { name: 'ران مرغ پخته شده', category: 'پروتئین', cal: 220, p: 24, c: 0, f: 13 },
+            { name: 'گوشت گوساله لذیذ پخته', category: 'پروتئین', cal: 210, p: 28, c: 0, f: 10 },
+            { name: 'گوشت گوسفندی کم چرب', category: 'پروتئین', cal: 250, p: 25, c: 0, f: 16 },
+            { name: 'تخم مرغ آب‌پز کامل', category: 'پروتئین', cal: 155, p: 13, c: 1.1, f: 11 },
+            { name: 'سفیده تخم مرغ', category: 'پروتئین', cal: 52, p: 11, c: 0.7, f: 0.2 },
+            { name: 'نیمرو با روغن', category: 'پروتئین', cal: 210, p: 12, c: 1, f: 17 },
+            { name: 'تن ماهی در روغن (آبکش شده)', category: 'پروتئین', cal: 198, p: 29, c: 0, f: 8 },
+            { name: 'شیر کم چرب (۱.۵٪)', category: 'لبنیات', cal: 42, p: 3.4, c: 5, f: 1.5 },
+            { name: 'ماست یونانی پرپروتئین', category: 'لبنیات', cal: 59, p: 10, c: 3.6, f: 0.4 },
+            { name: 'پنیر لاکتیکی / سفید ایرانی', category: 'لبنیات', cal: 240, p: 14, c: 2, f: 19 },
+
+            // آجیل و مغزها
+            { name: 'پسته خام / شور', category: 'آجیل', cal: 562, p: 20, c: 28, f: 45 },
+            { name: 'گردو تازه', category: 'آجیل', cal: 654, p: 15, c: 14, f: 65 },
+            { name: 'بادام درختی', category: 'آجیل', cal: 579, p: 21, c: 22, f: 50 },
+            { name: 'بادام زمینی', category: 'آجیل', cal: 567, p: 26, c: 16, f: 49 },
+            { name: 'تخمه آفتابگردان', category: 'آجیل', cal: 584, p: 21, c: 20, f: 51 }
+        ];
+
+        let localWorkoutsList = [];
+        let allFoods = [];
+
+        let userState = JSON.parse(localStorage.getItem('cal_user_state')) || null;
+        let todayData = JSON.parse(localStorage.getItem('cal_today_data')) || { consumed: 0, burned: 0, water: 0 };
+        let selectedItemForAdd = null;
+        let isWorkoutMode = false;
+        let searchTimeout = null;
+
+        function combineDatabase() {
+            allFoods = [...localFoodsPart1, ...localFoodsPart2];
+            document.getElementById('food-count-notice').innerText = `بانک آفلاین و آنلاین فعال است (${allFoods.length} آیتم داخلی).`;
+            renderLocalFoods(allFoods);
+        }
+
+        function initApp() {
+            if (!userState) {
+                document.getElementById('modal-onboarding').style.display = 'flex';
+            } else {
+                updateProfileInputs();
+                calculateTDEE();
+                updateDashboard();
+            }
+            combineDatabase();
+            renderWorkouts();
+        }
+
+        function calculateTDEE() {
+            if (!userState) return 2000;
+            const gender = userState.gender || 'male';
+            const age = parseFloat(userState.age) || 25;
+            const weight = parseFloat(userState.weight) || 70;
+            const height = parseFloat(userState.height) || 175;
+            const activity = parseFloat(userState.activity) || 1.2;
+
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+            let tdee = Math.round(bmr * activity);
+
+            if (isNaN(tdee) || tdee <= 0) tdee = 2000;
+
+            userState.tdee = tdee;
+            localStorage.setItem('cal_user_state', JSON.stringify(userState));
+            return tdee;
+        }
+
+        function submitOnboarding() {
+            userState = {
+                gender: document.getElementById('init-gender').value,
+                age: parseFloat(document.getElementById('init-age').value) || 25,
+                height: parseFloat(document.getElementById('init-height').value) || 175,
+                weight: parseFloat(document.getElementById('init-weight').value) || 70,
+                activity: document.getElementById('init-activity').value
+            };
+            calculateTDEE();
+            document.getElementById('modal-onboarding').style.display = 'none';
+            updateProfileInputs();
+            updateDashboard();
+        }
+
+        function saveProfileFromSettings() {
+            userState = {
+                gender: document.getElementById('user-gender').value,
+                age: parseFloat(document.getElementById('user-age').value) || 25,
+                height: parseFloat(document.getElementById('user-height').value) || 175,
+                weight: parseFloat(document.getElementById('user-weight').value) || 70,
+                activity: document.getElementById('user-activity').value
+            };
+            calculateTDEE();
+            updateDashboard();
+            alert('پروفایل بروزرسانی شد.');
+        }
+
+        function updateProfileInputs() {
+            if (!userState) return;
+            document.getElementById('user-gender').value = userState.gender || 'male';
+            document.getElementById('user-age').value = userState.age || 25;
+            document.getElementById('user-height').value = userState.height || 175;
+            document.getElementById('user-weight').value = userState.weight || 70;
+            document.getElementById('user-activity').value = userState.activity || '1.2';
+        }
+
+        function updateDashboard() {
+            const target = (userState && userState.tdee && !isNaN(userState.tdee)) ? userState.tdee : 2000;
+            const consumed = parseFloat(todayData.consumed) || 0;
+            const burned = parseFloat(todayData.burned) || 0;
+            const remaining = target - consumed + burned;
+            
+            document.getElementById('consumed-cal').innerText = consumed;
+            document.getElementById('burned-cal').innerText = burned;
+            document.getElementById('remaining-cal').innerText = isNaN(remaining) ? 2000 : remaining;
+            document.getElementById('water-count').innerText = `${todayData.water || 0} از 8 لیوان 💧`;
+
+            localStorage.setItem('cal_today_data', JSON.stringify(todayData));
+        }
+
+        function addWater(val) {
+            todayData.water = Math.max(0, (todayData.water || 0) + val);
+            updateDashboard();
+        }
+
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function renderLocalFoods(list) {
+            const listEl = document.getElementById('food-list');
+            if (!list || list.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">در حال جستجوی آنلاین...</p>';
+                return;
+            }
+
+            listEl.innerHTML = list.map(f => `
+                <div class="item-card" onclick='openModalWithData("${f.name}", ${f.cal}, false)'>
+                    <div class="item-info">
+                        <div class="name">${f.isOnline ? '<span class="badge-online">آنلاین</span>' : ''}${f.name}</div>
+                        <div class="details">دسته: ${f.category} | پروتئین: ${f.p}g | کربو: ${f.c}g</div>
+                    </div>
+                    <div class="item-value">${f.cal} کالری</div>
+                </div>
+            `).join('');
+        }
+
+        function handleFoodSearch() {
+            const query = normalizeText(document.getElementById('food-search').value);
+            if (!query) {
+                renderLocalFoods(allFoods);
+                return;
+            }
+
+            const filtered = allFoods.filter(f => normalizeText(f.name).includes(query));
+            renderLocalFoods(filtered);
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchOnlineFoods(query, filtered);
+            }, 600);
+        }
+
+        async function fetchOnlineFoods(query, currentFiltered) {
+            try {
+                const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`);
+                const data = await res.json();
+                
+                if (data.products && data.products.length > 0) {
+                    const onlineItems = data.products.map(p => {
+                        const nut = p.nutriments || {};
+                        return {
+                            name: p.product_name_fa || p.product_name || query,
+                            category: 'آنلاین جهانی',
+                            cal: Math.round(nut['energy-kcal_100g'] || nut['energy-kcal'] || 150),
+                            p: Math.round(nut.proteins_100g || 0),
+                            c: Math.round(nut.carbohydrates_100g || 0),
+                            f: Math.round(nut.fat_100g || 0),
+                            isOnline: true
+                        };
+                    }).filter(i => i.cal > 0);
+
+                    const combined = [...currentFiltered, ...onlineItems];
+                    renderLocalFoods(combined);
+                }
+            } catch(e) {
+                console.log('Online search offline/unreachable');
+            }
+        }
+
+        function renderWorkouts() {
+            const query = normalizeText(document.getElementById('workout-search').value);
+            const listEl = document.getElementById('workout-list');
+            
+            const filtered = localWorkoutsList.filter(w => normalizeText(w.name).includes(query));
+            if(filtered.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">موردی یافت نشد</p>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(w => `
+                <div class="item-card" onclick='openModalWithData("${w.name}", ${w.calPerMin}, true)'>
+                    <div class="item-info">
+                        <div class="name">${w.name}</div>
+                        <div class="details">دسته: ${w.category}</div>
+                    </div>
+                    <div class="item-value burn">${w.calPerMin} کالری/دقیقه</div>
+                </div>
+            `).join('');
+        }
+
+        function openModalWithData(name, val, workout) {
+            isWorkoutMode = workout;
+            selectedItemForAdd = { name, val };
+            if(workout) {
+                document.getElementById('modal-item-title').innerText = `ثبت فعالیت: ${name}`;
+                document.getElementById('modal-item-unit-label').innerText = 'مدت زمان فعالیت (دقیقه)';
+                document.getElementById('modal-item-amount').value = 30;
+            } else {
+                document.getElementById('modal-item-title').innerText = `ثبت خوراکی: ${name}`;
+                document.getElementById('modal-item-unit-label').innerText = 'مقدار مصرفی (گرم)';
+                document.getElementById('modal-item-amount').value = 100;
+            }
+            document.getElementById('modal-item').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function confirmAddItem() {
+            const amount = parseFloat(document.getElementById('modal-item-amount').value) || 0;
+            if(amount <= 0) return;
+
+            if(isWorkoutMode) {
+                const burned = Math.round(selectedItemForAdd.val * amount);
+                todayData.burned += burned;
+                alert(`${burned} کالری سوزانده شده ثبت شد.`);
+            } else {
+                const consumed = Math.round((selectedItemForAdd.val / 100) * amount);
+                todayData.consumed += consumed;
+                alert(`${consumed} کالری دریافت شده ثبت شد.`);
+            }
+
+            updateDashboard();
+            closeModal('modal-item');
+            switchTab('dashboard', document.querySelectorAll('.nav-item')[0]);
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>کالری‌شمار هوشمند آنلاین و آفلاین</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 75px; direction: rtl; }
+
+        header { padding: 16px; background: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
+        .header-title h1 { font-size: 1.1rem; }
+        .header-title span { font-size: 0.8rem; color: var(--text-sub); }
+        .app-icon { width: 38px; height: 38px; background: #064e3b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid var(--accent-green); }
+
+        .container { padding: 16px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--card-border); }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; text-align: center; }
+        .summary-box { background: #0f172a; padding: 12px 8px; border-radius: 12px; }
+        .summary-box .val { font-size: 1.1rem; font-weight: bold; color: var(--accent-green); }
+        .summary-box .val.burned { color: var(--accent-red); }
+        .summary-box .lbl { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .online-notice { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); border-radius: 10px; padding: 10px; font-size: 0.8rem; color: var(--accent-green); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .search-box { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem; outline: none; }
+        
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--card-border); cursor: pointer; }
+        .item-card:active { background: #1e293b; }
+        .item-info .name { font-weight: bold; font-size: 0.95rem; }
+        .item-info .details { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
+        .item-value { color: var(--accent-green); font-weight: bold; font-size: 0.9rem; }
+        .item-value.burn { color: var(--accent-red); }
+        .badge-online { background: #0284c7; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #1e293b; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--card-border); }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-item .icon { font-size: 1.2rem; display: block; }
+        
+        .btn-submit { width: 100%; padding: 12px; background: var(--accent-green); border: none; border-radius: 10px; color: #000; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; }
+
+        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; padding: 20px; border-radius: 16px; border: 1px solid var(--card-border); }
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>کالری‌شمار هوشمند</h1>
+            <span id="current-date">امروز</span>
+        </div>
+        <div class="app-icon">🍏</div>
+    </header>
+
+    <div class="container">
+        <!-- داشبورد -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="card">
+                <h3>خلاصه انرژی امروز</h3>
+                <div class="summary-grid">
+                    <div class="summary-box"><div class="val" id="consumed-cal">0</div><div class="lbl">دریافتی</div></div>
+                    <div class="summary-box"><div class="val" id="remaining-cal">2000</div><div class="lbl">باقیمانده</div></div>
+                    <div class="summary-box"><div class="val burned" id="burned-cal">0</div><div class="lbl">سوخته شده</div></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>مصرف آب امروز</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <span id="water-count" style="font-size:1.1rem; font-weight:bold;">0 از 8 لیوان 💧</span>
+                    <div>
+                        <button onclick="addWater(1)" style="padding:6px 12px; background:var(--accent-green); border:none; border-radius:6px; font-weight:bold;">+ افزودن</button>
+                        <button onclick="addWater(-1)" style="padding:6px 12px; background:var(--card-border); border:none; border-radius:6px; color:#fff;">- کاهش</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- خوراکی‌ها -->
+        <div id="tab-foods" class="tab-content">
+            <div class="online-notice">
+                <span>🌐</span>
+                <span id="food-count-notice">جستجوی هوشمند آفلاین و آنلاین فعال است.</span>
+            </div>
+            <input type="text" id="food-search" class="search-box" placeholder="جستجوی غذا و میوه (سیب، موز، پیتزا، پسته)..." oninput="handleFoodSearch()">
+            <div id="food-list"></div>
+        </div>
+
+        <!-- کالری سوزی (ورزش) -->
+        <div id="tab-burn" class="tab-content">
+            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی ورزش و فعالیت (دویدن، شنا، پیاده‌روی، خانه تکانی)..." oninput="renderWorkouts()">
+            <div id="workout-list"></div>
+        </div>
+
+        <!-- آمار -->
+        <div id="tab-stats" class="tab-content">
+            <div class="card">
+                <h3>روند مصرف کالری</h3>
+                <div style="text-align:center; padding: 20px 0; color: var(--text-sub);">داده‌های روزانه به صورت اتوماتیک ذخیره می‌شوند.</div>
+            </div>
+        </div>
+
+        <!-- تنظیمات -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h3>پروفایل کاربری</h3>
+                <div class="input-group" style="margin-top:10px;">
+                    <label>جنسیت</label>
+                    <select id="user-gender"><option value="male">مرد</option><option value="female">زن</option></select>
+                </div>
+                <div class="input-group">
+                    <label>سن (سال)</label>
+                    <input type="number" id="user-age" value="25">
+                </div>
+                <div class="input-group">
+                    <label>قد (سانتی‌متر)</label>
+                    <input type="number" id="user-height" value="175">
+                </div>
+                <div class="input-group">
+                    <label>وزن (کیلوگرم)</label>
+                    <input type="number" id="user-weight" value="70">
+                </div>
+                <div class="input-group">
+                    <label>میزان فعالیت روزانه</label>
+                    <select id="user-activity">
+                        <option value="1.2">کم (نشسته / بدون ورزش)</option>
+                        <option value="1.375">متوسط (۱ تا ۳ جلسه ورزش در هفته)</option>
+                        <option value="1.55">زیاد (۳ تا ۵ جلسه ورزش در هفته)</option>
+                    </select>
+                </div>
+                <button class="btn-submit" onclick="saveProfileFromSettings()">بروزرسانی پروفایل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال‌ها -->
+    <div id="modal-onboarding" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">خوش آمدید! مشخصات خود را وارد کنید</div>
+            <div class="input-group"><label>جنسیت</label><select id="init-gender"><option value="male">مرد</option><option value="female">زن</option></select></div>
+            <div class="input-group"><label>سن (سال)</label><input type="number" id="init-age" value="25"></div>
+            <div class="input-group"><label>قد (سانتی‌متر)</label><input type="number" id="init-height" value="175"></div>
+            <div class="input-group"><label>وزن (کیلوگرم)</label><input type="number" id="init-weight" value="70"></div>
+            <div class="input-group">
+                <label>میزان فعالیت</label>
+                <select id="init-activity">
+                    <option value="1.2">کم (نشسته)</option>
+                    <option value="1.375">متوسط</option>
+                    <option value="1.55">زیاد</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="submitOnboarding()">محاسبه کالری و ورود</button>
+        </div>
+    </div>
+
+    <div id="modal-item" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-item-title">ثبت آیتم</div>
+            <div class="input-group">
+                <label id="modal-item-unit-label">مقدار (گرم / دقیقه)</label>
+                <input type="number" id="modal-item-amount" value="100">
+            </div>
+            <button class="btn-submit" onclick="confirmAddItem()">ثبت در برنامه امروز</button>
+            <button class="btn-submit" style="background:var(--card-border); color:#fff; margin-top:5px;" onclick="closeModal('modal-item')">انصراف</button>
+        </div>
+    </div>
+
+    <!-- ناوبری -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('dashboard', this)"><span class="icon">📊</span>داشبورد</div>
+        <div class="nav-item" onclick="switchTab('foods', this)"><span class="icon">🥗</span>خوراکی‌ها</div>
+        <div class="nav-item" onclick="switchTab('burn', this)"><span class="icon">🔥</span>کالری‌سوزی</div>
+        <div class="nav-item" onclick="switchTab('stats', this)"><span class="icon">📈</span>آمار</div>
+        <div class="nav-item" onclick="switchTab('settings', this)"><span class="icon">⚙️</span>تنظیمات</div>
+    </nav>
+
+    <script>
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+                .replace(/آ/g, 'ا').replace(/أ/g, 'ا')
+                .replace(/إ/g, 'ا').replace(/ۀ/g, 'ه')
+                .trim();
+        }
+
+        // غذاها بخش ۱
+        let localFoodsPart1 = [
+            { name: 'چلو کباب کوبیده', category: 'غذا سنتی', cal: 240, p: 14, c: 18, f: 12 },
+            { name: 'چلو جوجه کباب زعفرانی', category: 'غذا سنتی', cal: 180, p: 16, c: 16, f: 5 },
+            { name: 'چلو کباب برگ', category: 'غذا سنتی', cal: 200, p: 18, c: 15, f: 7 },
+            { name: 'خورشت قرمه سبزی با برنج', category: 'خورشت', cal: 175, p: 6, c: 20, f: 8 },
+            { name: 'خورشت قیمه سیب زمینی با برنج', category: 'خورشت', cal: 185, p: 7, c: 22, f: 8 },
+            { name: 'خورشت فسنجان با مرغ و برنج', category: 'خورشت', cal: 260, p: 8, c: 20, f: 16 },
+            { name: 'زرشک پلو با مرغ', category: 'پلو', cal: 195, p: 11, c: 22, f: 6 },
+            { name: 'باقالی پلو با ماهیچه', category: 'پلو', cal: 210, p: 12, c: 22, f: 8 },
+            { name: 'عدس پلو با گوشت چرخ‌کرده', category: 'پلو', cal: 175, p: 7, c: 26, f: 4 },
+            { name: 'لوبیا پلو با گوشت تکه‌ای', category: 'پلو', cal: 180, p: 7, c: 25, f: 5 },
+            { name: 'ته چین مرغ زعفرانی', category: 'پلو', cal: 210, p: 10, c: 25, f: 8 },
+            { name: 'آبگوشت / دیزی سنتی', category: 'سنتی', cal: 210, p: 12, c: 15, f: 11 },
+            { name: 'آش رشته با کشک و پیازداغ', category: 'آش', cal: 140, p: 5, c: 20, f: 4 },
+            { name: 'حلیم گندم با گوشت', category: 'سنتی', cal: 170, p: 8, c: 22, f: 5 },
+            { name: 'کله پاچه (مخلوط)', category: 'سنتی', cal: 310, p: 18, c: 0, f: 26 },
+            { name: 'میرزا قاسمی', category: 'غذای شمالی', cal: 120, p: 4, c: 8, f: 8 },
+            { name: 'کشک بادمجان', category: 'سنتی', cal: 165, p: 5, c: 10, f: 12 },
+            { name: 'کوکو سبزی', category: 'کوکو', cal: 190, p: 6, c: 8, f: 15 },
+            { name: 'کتلت گوشت', category: 'سنتی', cal: 240, p: 12, c: 14, f: 15 },
+            { name: 'خوراک عدسی سنتی', category: 'خوراک', cal: 115, p: 7, c: 19, f: 1 }
+        ];
+
+        // غذاها، میوه‌ها و آجیل‌ها بخش ۲
+        let localFoodsPart2 = [
+            { name: 'سیب درختی', category: 'میوه', cal: 52, p: 0.3, c: 14, f: 0.2 },
+            { name: 'موز', category: 'میوه', cal: 89, p: 1.1, c: 23, f: 0.3 },
+            { name: 'پرتقال', category: 'میوه', cal: 47, p: 0.9, c: 12, f: 0.1 },
+            { name: 'خیار', category: 'میوه / سبزی', cal: 15, p: 0.7, c: 3.6, f: 0.1 },
+            { name: 'گوجه فرنگی', category: 'میوه / سبزی', cal: 18, p: 0.9, c: 3.9, f: 0.2 },
+            { name: 'هندوانه', category: 'میوه', cal: 30, p: 0.6, c: 8, f: 0.2 },
+            { name: 'خربزه / طالبی', category: 'میوه', cal: 34, p: 0.8, c: 8.2, f: 0.2 },
+            { name: 'انگور', category: 'میوه', cal: 69, p: 0.7, c: 18, f: 0.2 },
+            { name: 'انار', category: 'میوه', cal: 83, p: 1.7, c: 19, f: 1.2 },
+            { name: 'توت فرنگی', category: 'میوه', cal: 32, p: 0.7, c: 7.7, f: 0.3 },
+            { name: 'گیلاس / آلبالو', category: 'میوه', cal: 50, p: 1, c: 12, f: 0.3 },
+            { name: 'هلو / شلیل', category: 'میوه', cal: 39, p: 0.9, c: 9.5, f: 0.3 },
+            { name: 'زردآلو', category: 'میوه', cal: 48, p: 1.4, c: 11, f: 0.4 },
+            { name: 'کیوی', category: 'میوه', cal: 61, p: 1.1, c: 15, f: 0.5 },
+            { name: 'خرما (رطب)', category: 'میوه خشک', cal: 277, p: 1.8, c: 75, f: 0.2 },
+            { name: 'پیتزا مخلوط', category: 'فست فود', cal: 266, p: 11, c: 30, f: 11 },
+            { name: 'همبرگر ساده', category: 'فست فود', cal: 250, p: 13, c: 24, f: 11 },
+            { name: 'ساندویچ فلافل', category: 'فست فود', cal: 220, p: 7, c: 32, f: 8 },
+            { name: 'سیب زمینی سرخ‌کرده', category: 'فست فود', cal: 312, p: 3.4, c: 41, f: 15 },
+            { name: 'نان سنگک', category: 'نان', cal: 259, p: 9, c: 52, f: 1.5 },
+            { name: 'نان بربری', category: 'نان', cal: 265, p: 8.5, c: 54, f: 1.5 },
+            { name: 'نان لواش', category: 'نان', cal: 285, p: 8, c: 58, f: 1.8 },
+            { name: 'سینه مرغ کباب شده', category: 'پروتئین', cal: 165, p: 31, c: 0, f: 3.6 },
+            { name: 'تخم مرغ آب‌پز', category: 'پروتئین', cal: 155, p: 13, c: 1.1, f: 11 },
+            { name: 'پسته خام', category: 'آجیل', cal: 562, p: 20, c: 28, f: 45 },
+            { name: 'گردو تازه', category: 'آجیل', cal: 654, p: 15, c: 14, f: 65 },
+            { name: 'بادام درختی', category: 'آجیل', cal: 579, p: 21, c: 22, f: 50 }
+        ];
+
+        // بانک کامل ورزش‌ها و فعالیت‌های بدنی (میزان مصرف کالری به ازای هر دقیقه)
+        let localWorkoutsList = [
+            { name: 'پیاده‌روی معمولی (سرعت متوسط)', category: 'سبک', calPerMin: 4.5 },
+            { name: 'پیاده‌روی تند / پیاده‌روی هوازی', category: 'هوازی', calPerMin: 6.5 },
+            { name: 'دویدن نرم و آهسته (Jogging)', category: 'هوازی', calPerMin: 9.0 },
+            { name: 'دویدن سریع / اینتروال', category: 'هوازی سنگین', calPerMin: 13.5 },
+            { name: 'دوچرخه‌سواری آرامی/شهری', category: 'هوازی', calPerMin: 6.0 },
+            { name: 'دوچرخه‌سواری حرفه‌ای / ثابت', category: 'هوازی سنگین', calPerMin: 10.5 },
+            { name: 'شنا تفریحی', category: 'آبی', calPerMin: 7.0 },
+            { name: 'شنا کرال سینه / قورباغه حرفه‌ای', category: 'آبی سنگین', calPerMin: 11.0 },
+            { name: 'بدنسازی / تمرین با وزنه', category: 'قدرتی', calPerMin: 5.5 },
+            { name: 'تمرینات کراس‌فیت / HIIT', category: 'قدرتی سنگین', calPerMin: 12.0 },
+            { name: 'طناب زدن با سرعت متوسط', category: 'هوازی سنگین', calPerMin: 11.0 },
+            { name: 'طناب زدن سریع', category: 'هوازی سنگین', calPerMin: 14.0 },
+            { name: 'بوکس / کیک‌بوکسینگ', category: 'رزمی', calPerMin: 10.5 },
+            { name: 'کوشتی / تکواندو / کاراته', category: 'رزمی', calPerMin: 9.5 },
+            { name: 'فوتبال سالنی / چمن', category: 'توپی', calPerMin: 9.0 },
+            { name: 'بسکتبال', category: 'توپی', calPerMin: 8.5 },
+            { name: 'والیبال تفریحی / ساحلی', category: 'توپی', calPerMin: 5.0 },
+            { name: 'پادري / تنیس', category: 'ورزش راکتی', calPerMin: 7.5 },
+            { name: 'یوگا / حرکات کششی', category: 'ذهن و جسم', calPerMin: 3.5 },
+            { name: 'پیلاتس', category: 'قدرتی سبک', calPerMin: 5.0 },
+            { name: 'رقص زومبا / هوازی موزون', category: 'هوازی', calPerMin: 8.0 },
+            { name: 'کوهنوردی با شیپ ملایم', category: 'طبیعت', calPerMin: 8.5 },
+            { name: 'کوهنوردی سنگین با کوله‌پشتی', category: 'طبیعت سنگین', calPerMin: 11.5 },
+            { name: 'بالا رفتن از پله‌ها', category: 'روزمره', calPerMin: 10.0 },
+            { name: 'کارهای خانه (جاروبرقی، گردگیری)', category: 'روزمره', calPerMin: 3.5 },
+            { name: 'خانه تکانی سنگین / شستشو', category: 'روزمره', calPerMin: 5.5 },
+            { name: 'باغبانی و بیل زدن', category: 'روزمره', calPerMin: 6.0 }
+        ];
+
+        let allFoods = [];
+        let userState = JSON.parse(localStorage.getItem('cal_user_state')) || null;
+        let todayData = JSON.parse(localStorage.getItem('cal_today_data')) || { consumed: 0, burned: 0, water: 0 };
+        let selectedItemForAdd = null;
+        let isWorkoutMode = false;
+        let searchTimeout = null;
+
+        function combineDatabase() {
+            allFoods = [...localFoodsPart1, ...localFoodsPart2];
+            document.getElementById('food-count-notice').innerText = `بانک آفلاین و آنلاین فعال است (${allFoods.length} آیتم داخلی).`;
+            renderLocalFoods(allFoods);
+        }
+
+        function initApp() {
+            if (!userState) {
+                document.getElementById('modal-onboarding').style.display = 'flex';
+            } else {
+                updateProfileInputs();
+                calculateTDEE();
+                updateDashboard();
+            }
+            combineDatabase();
+            renderWorkouts();
+        }
+
+        function calculateTDEE() {
+            if (!userState) return 2000;
+            const gender = userState.gender || 'male';
+            const age = parseFloat(userState.age) || 25;
+            const weight = parseFloat(userState.weight) || 70;
+            const height = parseFloat(userState.height) || 175;
+            const activity = parseFloat(userState.activity) || 1.2;
+
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+            let tdee = Math.round(bmr * activity);
+
+            if (isNaN(tdee) || tdee <= 0) tdee = 2000;
+
+            userState.tdee = tdee;
+            localStorage.setItem('cal_user_state', JSON.stringify(userState));
+            return tdee;
+        }
+
+        function submitOnboarding() {
+            userState = {
+                gender: document.getElementById('init-gender').value,
+                age: parseFloat(document.getElementById('init-age').value) || 25,
+                height: parseFloat(document.getElementById('init-height').value) || 175,
+                weight: parseFloat(document.getElementById('init-weight').value) || 70,
+                activity: document.getElementById('init-activity').value
+            };
+            calculateTDEE();
+            document.getElementById('modal-onboarding').style.display = 'none';
+            updateProfileInputs();
+            updateDashboard();
+        }
+
+        function saveProfileFromSettings() {
+            userState = {
+                gender: document.getElementById('user-gender').value,
+                age: parseFloat(document.getElementById('user-age').value) || 25,
+                height: parseFloat(document.getElementById('user-height').value) || 175,
+                weight: parseFloat(document.getElementById('user-weight').value) || 70,
+                activity: document.getElementById('user-activity').value
+            };
+            calculateTDEE();
+            updateDashboard();
+            alert('پروفایل بروزرسانی شد.');
+        }
+
+        function updateProfileInputs() {
+            if (!userState) return;
+            document.getElementById('user-gender').value = userState.gender || 'male';
+            document.getElementById('user-age').value = userState.age || 25;
+            document.getElementById('user-height').value = userState.height || 175;
+            document.getElementById('user-weight').value = userState.weight || 70;
+            document.getElementById('user-activity').value = userState.activity || '1.2';
+        }
+
+        function updateDashboard() {
+            const target = (userState && userState.tdee && !isNaN(userState.tdee)) ? userState.tdee : 2000;
+            const consumed = parseFloat(todayData.consumed) || 0;
+            const burned = parseFloat(todayData.burned) || 0;
+            const remaining = target - consumed + burned;
+            
+            document.getElementById('consumed-cal').innerText = consumed;
+            document.getElementById('burned-cal').innerText = burned;
+            document.getElementById('remaining-cal').innerText = isNaN(remaining) ? 2000 : remaining;
+            document.getElementById('water-count').innerText = `${todayData.water || 0} از 8 لیوان 💧`;
+
+            localStorage.setItem('cal_today_data', JSON.stringify(todayData));
+        }
+
+        function addWater(val) {
+            todayData.water = Math.max(0, (todayData.water || 0) + val);
+            updateDashboard();
+        }
+
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function renderLocalFoods(list) {
+            const listEl = document.getElementById('food-list');
+            if (!list || list.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">در حال جستجوی آنلاین...</p>';
+                return;
+            }
+
+            listEl.innerHTML = list.map(f => `
+                <div class="item-card" onclick='openModalWithData("${f.name}", ${f.cal}, false)'>
+                    <div class="item-info">
+                        <div class="name">${f.isOnline ? '<span class="badge-online">آنلاین</span>' : ''}${f.name}</div>
+                        <div class="details">دسته: ${f.category} | پروتئین: ${f.p}g | کربو: ${f.c}g</div>
+                    </div>
+                    <div class="item-value">${f.cal} کالری</div>
+                </div>
+            `).join('');
+        }
+
+        function handleFoodSearch() {
+            const query = normalizeText(document.getElementById('food-search').value);
+            if (!query) {
+                renderLocalFoods(allFoods);
+                return;
+            }
+
+            const filtered = allFoods.filter(f => normalizeText(f.name).includes(query));
+            renderLocalFoods(filtered);
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchOnlineFoods(query, filtered);
+            }, 600);
+        }
+
+        async function fetchOnlineFoods(query, currentFiltered) {
+            try {
+                const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`);
+                const data = await res.json();
+                
+                if (data.products && data.products.length > 0) {
+                    const onlineItems = data.products.map(p => {
+                        const nut = p.nutriments || {};
+                        return {
+                            name: p.product_name_fa || p.product_name || query,
+                            category: 'آنلاین جهانی',
+                            cal: Math.round(nut['energy-kcal_100g'] || nut['energy-kcal'] || 150),
+                            p: Math.round(nut.proteins_100g || 0),
+                            c: Math.round(nut.carbohydrates_100g || 0),
+                            f: Math.round(nut.fat_100g || 0),
+                            isOnline: true
+                        };
+                    }).filter(i => i.cal > 0);
+
+                    const combined = [...currentFiltered, ...onlineItems];
+                    renderLocalFoods(combined);
+                }
+            } catch(e) {
+                console.log('Online search offline/unreachable');
+            }
+        }
+
+        function renderWorkouts() {
+            const query = normalizeText(document.getElementById('workout-search').value);
+            const listEl = document.getElementById('workout-list');
+            
+            const filtered = localWorkoutsList.filter(w => normalizeText(w.name).includes(query));
+            if(filtered.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">ورزش یا فعالیتی یافت نشد</p>';
                 return;
             }
 
