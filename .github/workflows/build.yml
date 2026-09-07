@@ -18,6 +18,7 @@ jobs:
       with:
         node-version: '18'
 
+    # تولید کامل فایل ۲۰ هزار غذا برای برنامه
     - name: Generate 20,000 Foods Database
       run: node generate_foods.js
 
@@ -27,19 +28,21 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # ایجاد خودکار فایل gradle.properties برای حل خطای AndroidX
-    - name: Configure AndroidX Properties
-      run: |
-        echo "android.useAndroidX=true" >> gradle.properties
-        echo "android.enableJetifier=true" >> gradle.properties
-
-    # ساخت فایل gradlew در صورت عدم وجود و اعطای دسترسی اجرایی
+    # ساخت فایل gradlew در صورت عدم وجود
     - name: Ensure gradlew exists
       run: |
         if [ ! -f "gradlew" ]; then
           gradle wrapper
         fi
         chmod +x gradlew
+
+    # ساخت کی‌استور موقت جهت رفع ارور validateSigningRelease
+    - name: Generate Temporary Keystore
+      run: |
+        keytool -genkey -v -keystore app/release.keystore \
+          -alias key0 -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass android -keypass android \
+          -dname "CN=CalorieTracker, OU=Dev, O=App, L=City, S=State, C=US"
 
     - name: Build with Gradle
       run: ./gradlew assembleRelease
