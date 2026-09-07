@@ -16,9 +16,9 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
-    # تولید کامل فایل ۲۰ هزار غذا برای برنامه
+    # تولید کامل فایل ۲۰ هزار غذا
     - name: Generate 20,000 Foods Database
       run: node generate_foods.js
 
@@ -28,15 +28,19 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # ساخت فایل gradlew در صورت عدم وجود
+    # تنظیم دقیق نسخه Gradle به 8.5 جهت جلوگیری از باگ نسخه 9.7
+    - name: Setup Gradle 8.5
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.5'
+
+    # ساخت فایل gradlew سازگار
     - name: Ensure gradlew exists
       run: |
-        if [ ! -f "gradlew" ]; then
-          gradle wrapper
-        fi
+        gradle wrapper --gradle-version 8.5
         chmod +x gradlew
 
-    # ساخت کی‌استور موقت جهت رفع ارور validateSigningRelease
+    # ساخت کی‌استور موقت
     - name: Generate Temporary Keystore
       run: |
         keytool -genkey -v -keystore app/release.keystore \
