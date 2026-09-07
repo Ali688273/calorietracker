@@ -6,87 +6,48 @@
     <title>کالری‌شمار هوشمند</title>
     <style>
         :root {
-            --bg-color: #121824;
+            --bg-color: #0f172a;
             --card-bg: #1e293b;
-            --accent-green: #00e676;
-            --text-main: #ffffff;
+            --card-border: #334155;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
             --text-sub: #94a3b8;
-            --border-color: #334155;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 70px; direction: rtl; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding-bottom: 70px;
-        }
-
-        header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #182232;
-        }
-
+        header { padding: 16px; background: #1e293b; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
         .header-title h1 { font-size: 1.1rem; }
         .header-title span { font-size: 0.8rem; color: var(--text-sub); }
-        .app-icon { width: 35px; height: 35px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .app-icon { width: 36px; height: 36px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        .container { padding: 15px; }
+        .container { padding: 16px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--card-border); }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 10px; }
-        .summary-box { background: #0f172a; padding: 10px; border-radius: 12px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; text-align: center; }
+        .summary-box { background: #0f172a; padding: 12px 8px; border-radius: 12px; }
         .summary-box .val { font-size: 1.1rem; font-weight: bold; color: var(--accent-green); }
         .summary-box .lbl { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 60px;
-            background: #182232;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; }
-        .nav-item.active { color: var(--accent-green); }
-        .nav-item .icon { font-size: 1.2rem; display: block; }
-
-        /* Search & Food List */
-        .search-box {
-            width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border-color);
-            border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem;
-        }
-
-        .food-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px;
-        }
+        .search-box { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem; }
+        .food-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--card-border); }
         .food-info .name { font-weight: bold; font-size: 0.95rem; }
         .food-info .details { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
         .food-cal { color: var(--accent-green); font-weight: bold; font-size: 0.9rem; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #1e293b; display: flex; justify-around: align-items: center; border-top: 1px solid var(--card-border); }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-item .icon { font-size: 1.2rem; display: block; }
+        
+        .btn-submit { width: 100%; padding: 12px; background: var(--accent-green); border: none; border-radius: 10px; color: #000; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; }
     </style>
 </head>
 <body>
@@ -112,14 +73,14 @@
             </div>
             <div class="card">
                 <h3>میزان مصرف آب</h3>
-                <p style="margin-top: 10px; color: var(--text-sub);">0 از 8 لیوان</p>
+                <p style="margin-top: 8px; color: var(--text-sub);">0 از 8 لیوان</p>
             </div>
         </div>
 
         <!-- خوراکی‌ها -->
         <div id="tab-foods" class="tab-content">
             <input type="text" id="food-search" class="search-box" placeholder="جستجوی غذا (مثلا: موز، سیب، برنج)..." oninput="renderFoods()">
-            <div id="food-list"></div>
+            <div id="food-list">در حال بارگذاری غذاها...</div>
         </div>
 
         <!-- کالری سوزی -->
@@ -141,6 +102,23 @@
         <div id="tab-settings" class="tab-content">
             <div class="card">
                 <h3>اطلاعات شخصی و تنظیمی</h3>
+                <div class="input-group" style="margin-top:10px;">
+                    <label>جنسیت</label>
+                    <select id="user-gender"><option value="male">مرد</option><option value="female">زن</option></select>
+                </div>
+                <div class="input-group">
+                    <label>سن (سال)</label>
+                    <input type="number" id="user-age" value="25">
+                </div>
+                <div class="input-group">
+                    <label>قد (سانتی‌متر)</label>
+                    <input type="number" id="user-height" value="175">
+                </div>
+                <div class="input-group">
+                    <label>وزن (کیلوگرم)</label>
+                    <input type="number" id="user-weight" value="70">
+                </div>
+                <button class="btn-submit" onclick="saveProfile()">ذخیره تغییرات پروفایل</button>
             </div>
         </div>
     </div>
@@ -154,39 +132,6 @@
         <div class="nav-item" onclick="switchTab('settings', this)"><span class="icon">⚙️</span>تنظیمات</div>
     </nav>
 
-    <!-- بارگذاری دیتابیس ۲۰ هزار غذا -->
-    <script src="foods.js"></script>
-    <script>
-        function switchTab(tabName, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
-            el.classList.add('active');
-            if(tabName === 'foods') renderFoods();
-        }
-
-        function renderFoods() {
-            const query = document.getElementById('food-search').value.trim().toLowerCase();
-            const listEl = document.getElementById('food-list');
-            const foods = window.FOODS_DATABASE || [];
-            
-            const filtered = foods.filter(f => f.name.toLowerCase().includes(query)).slice(0, 30);
-            
-            if(filtered.length === 0) {
-                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">غذایی یافت نشد</p>';
-                return;
-            }
-
-            listEl.innerHTML = filtered.map(f => `
-                <div class="food-item">
-                    <div class="food-info">
-                        <div class="name">${f.name}</div>
-                        <div class="details">پروتئین: ${f.protein}g | کربو: ${f.carbs}g | چربی: ${f.fat}g</div>
-                    </div>
-                    <div class="food-cal">${f.calories} کالری</div>
-                </div>
-            `).join('');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
