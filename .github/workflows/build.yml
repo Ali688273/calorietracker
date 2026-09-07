@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: '20'
 
-    # تولید کامل فایل ۲۰ هزار غذا
+    # تولید کامل دیتابیس ۲۰ هزار غذا
     - name: Generate 20,000 Foods Database
       run: node generate_foods.js
 
@@ -28,24 +28,23 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # تنظیم دقیق نسخه Gradle به 8.5 جهت جلوگیری از باگ نسخه 9.7
+    # تنظیم Gradle 8.5 جهت بیلد بدون خطای متادیتا
     - name: Setup Gradle 8.5
       uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: '8.5'
 
-    # ساخت فایل gradlew سازگار
     - name: Ensure gradlew exists
       run: |
         gradle wrapper --gradle-version 8.5
         chmod +x gradlew
 
-    # ساخت کی‌استور موقت
+    # ساخت کی‌استور دقیقا مطابق با اطلاعات build.gradle.kts
     - name: Generate Temporary Keystore
       run: |
         keytool -genkey -v -keystore app/release.keystore \
-          -alias key0 -keyalg RSA -keysize 2048 -validity 10000 \
-          -storepass android -keypass android \
+          -alias caloriekey -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass CaloriePassword123 -keypass CaloriePassword123 \
           -dname "CN=CalorieTracker, OU=Dev, O=App, L=City, S=State, C=US"
 
     - name: Build with Gradle
