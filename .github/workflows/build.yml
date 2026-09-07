@@ -27,7 +27,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # ساخت فایل gradlew در صورت عدم وجود و دادن دسترسی اجرای آن
+    # ایجاد خودکار فایل gradle.properties برای حل خطای AndroidX
+    - name: Configure AndroidX Properties
+      run: |
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "android.enableJetifier=true" >> gradle.properties
+
+    # ساخت فایل gradlew در صورت عدم وجود و اعطای دسترسی اجرایی
     - name: Ensure gradlew exists
       run: |
         if [ ! -f "gradlew" ]; then
