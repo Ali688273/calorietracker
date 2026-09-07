@@ -2,165 +2,191 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>کالری‌شمار هوشمند</title>
     <style>
         :root {
-            --primary: #4CAF50;
-            --primary-dark: #388E3C;
-            --accent: #FF9800;
-            --bg: #F4F6F8;
-            --card: #FFFFFF;
-            --text: #333333;
-            --muted: #777777;
-            --danger: #F44336;
-        }
-        * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 70px; }
-        
-        /* هدر جدید همراه با آیکون */
-        .header { 
-            background: linear-gradient(135deg, #4CAF50, #2E7D32); 
-            color: white; 
-            padding: 15px; 
-            text-align: center; 
-            font-weight: bold; 
-            font-size: 18px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .header-icon {
-            width: 32px;
-            height: 32px;
-            background: white;
-            border-radius: 50%;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            --bg-color: #121824;
+            --card-bg: #1e293b;
+            --accent-green: #00e676;
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --border-color: #334155;
         }
 
-        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 70px;
+        }
+
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #182232;
+        }
+
+        .header-title h1 { font-size: 1.1rem; }
+        .header-title span { font-size: 0.8rem; color: var(--text-sub); }
+        .app-icon { width: 35px; height: 35px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        .container { padding: 15px; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 10px; }
+        .summary-box { background: #0f172a; padding: 10px; border-radius: 12px; }
+        .summary-box .val { font-size: 1.1rem; font-weight: bold; color: var(--accent-green); }
+        .summary-box .lbl { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .card-title { font-weight: bold; margin-bottom: 10px; color: var(--primary-dark); font-size: 16px; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
-        .progress-container { background: #e0e0e0; border-radius: 10px; height: 15px; width: 100%; overflow: hidden; margin: 10px 0; }
-        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.3s ease; }
-        .search-box { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 10px; }
-        .search-box:focus { border-color: var(--primary); }
-        .categories { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
-        .cat-btn { background: #e0e0e0; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
-        .cat-btn.active { background: var(--primary); color: white; }
-        .food-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
-        .food-item { background: #fafafa; border: 1px solid #eee; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .food-info h4 { margin: 0 0 4px 0; font-size: 14px; }
-        .food-info p { margin: 0; font-size: 11px; color: var(--muted); }
-        .btn { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .btn-danger { background: var(--danger); }
-        .input-group { margin-bottom: 10px; }
-        .input-group label { display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted); }
-        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); }
-        .nav-item { border: none; background: none; font-size: 12px; color: var(--muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .stat-box { background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-box .val { font-size: 18px; font-weight: bold; color: var(--primary-dark); }
-        .stat-box .lbl { font-size: 11px; color: var(--muted); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: #182232;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-item .icon { font-size: 1.2rem; display: block; }
+
+        /* Search & Food List */
+        .search-box {
+            width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border-color);
+            border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 0.9rem;
+        }
+
+        .food-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px;
+        }
+        .food-info .name { font-weight: bold; font-size: 0.95rem; }
+        .food-info .details { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
+        .food-cal { color: var(--accent-green); font-weight: bold; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <!-- هدر همراه با آیکون SVG اختصاصی -->
-    <div class="header">
-        <div class="header-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" fill="#E8F5E9"/>
-                <path d="M12 6C12 6 13.5 8 15 8C16.5 8 18 6.5 18 6.5C18 6.5 17.5 10 15 11.5C13.5 12.4 12 11 12 11" stroke="#2E7D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 18C14.2091 18 16 16.2091 16 14C16 12.5 14.5 11 12 9.5C9.5 11 8 12.5 8 14C8 16.2091 9.79086 18 12 18Z" fill="#FF9800"/>
-            </svg>
+    <header>
+        <div class="header-title">
+            <h1>کالری‌شمار هوشمند</h1>
+            <span id="current-date">امروز</span>
         </div>
-        <span>کالری‌شمار هوشمند</span>
-    </div>
+        <div class="app-icon">🍎</div>
+    </header>
 
     <div class="container">
-        <!-- تب امروز -->
-        <div id="tab-today" class="tab-content active">
+        <!-- داشبورد -->
+        <div id="tab-dashboard" class="tab-content active">
             <div class="card">
-                <div class="card-title">خلاصه وضعیت امروز</div>
-                <div class="stat-grid">
-                    <div class="stat-box"><div class="val" id="targetCal">2000</div><div class="lbl">هدف روزانه (کالری)</div></div>
-                    <div class="stat-box"><div class="val" id="consumedCal">0</div><div class="lbl">دریافتی امروز</div></div>
+                <h3>خلاصه انرژی امروز</h3>
+                <div class="summary-grid">
+                    <div class="summary-box"><div class="val" id="consumed-cal">0</div><div class="lbl">دریافتی</div></div>
+                    <div class="summary-box"><div class="val" id="remaining-cal">2000</div><div class="lbl">باقیمانده</div></div>
+                    <div class="summary-box"><div class="val" id="burned-cal">0</div><div class="lbl">سوخته شده</div></div>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
-                    <span>میزان پیشرفت</span>
-                    <span id="remainCal">2000 کالری باقی‌مانده</span>
-                </div>
-                <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
             </div>
-
             <div class="card">
-                <div class="card-title">لیست خوراکی‌های امروز</div>
-                <div id="todayList" class="food-list">
-                    <p style="text-align:center; color:#888; font-size:12px;">هنوز چیزی ثبت نکرده‌اید.</p>
-                </div>
+                <h3>میزان مصرف آب</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">0 از 8 لیوان</p>
             </div>
         </div>
 
-        <!-- تب ثبت غذا -->
+        <!-- خوراکی‌ها -->
         <div id="tab-foods" class="tab-content">
+            <input type="text" id="food-search" class="search-box" placeholder="جستجوی غذا (مثلا: موز، سیب، برنج)..." oninput="renderFoods()">
+            <div id="food-list"></div>
+        </div>
+
+        <!-- کالری سوزی -->
+        <div id="tab-burn" class="tab-content">
             <div class="card">
-                <div class="card-title">جستجو و ثبت خوراکی</div>
-                <input type="text" id="searchInput" class="search-box" placeholder="🔍 جستجوی بین ۲۰,۰۰۰ غذا، میوه، نان...">
-                <div class="categories">
-                    <button class="cat-btn active" onclick="filterCategory('همه')">همه</button>
-                    <button class="cat-btn" onclick="filterCategory('میوه‌ها')">میوه‌ها</button>
-                    <button class="cat-btn" onclick="filterCategory('غذاهای ایرانی')">غذاهای ایرانی</button>
-                    <button class="cat-btn" onclick="filterCategory('نان و غلات')">نان و غلات</button>
-                    <button class="cat-btn" onclick="filterCategory('لبنیات')">لبنیات</button>
-                    <button class="cat-btn" onclick="filterCategory('پروتئین‌ها')">پروتئین‌ها</button>
-                    <button class="cat-btn" onclick="filterCategory('فست فود')">فست فود</button>
-                </div>
-                <div id="foodList" class="food-list"></div>
+                <h3>ثبت فعالیت و ورزشی</h3>
+                <p style="color: var(--text-sub); font-size: 0.85rem; margin-top: 5px;">ورزش‌های روزانه خود را برای محاسبه دقیق ثبت کنید.</p>
             </div>
         </div>
 
-        <!-- تب پروفایل -->
-        <div id="tab-profile" class="tab-content">
+        <!-- آمار -->
+        <div id="tab-stats" class="tab-content">
             <div class="card">
-                <div class="card-title">مشخصات و اهداف شخص</div>
-                <div class="input-group">
-                    <label>جنسیت</label>
-                    <select id="gender"><option value="male">مرد</option><option value="female">زن</option></select>
-                </div>
-                <div class="input-group"><label>سن (سال)</label><input type="number" id="age" value="25"></div>
-                <div class="input-group"><label>قد (سانتی‌متر)</label><input type="number" id="height" value="175"></div>
-                <div class="input-group"><label>وزن (کیلوگرم)</label><input type="number" id="weight" value="70"></div>
-                <div class="input-group">
-                    <label>هدف وزنی</label>
-                    <select id="goal">
-                        <option value="maintain">تثبیت وزن</option>
-                        <option value="lose">کاهش وزن (چربی‌سوزی)</option>
-                        <option value="gain">افزایش وزن (عضله‌سازی)</option>
-                    </select>
-                </div>
-                <button class="btn" style="width:100%;" onclick="saveProfile()">محاسبه و ذخیره هدف</button>
+                <h3>روند مصرف کالری ۷ روز گذشته</h3>
+            </div>
+        </div>
+
+        <!-- تنظیمات -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h3>اطلاعات شخصی و تنظیمی</h3>
             </div>
         </div>
     </div>
 
-    <!-- منوی پایین -->
-    <div class="navbar">
-        <button class="nav-item active" onclick="switchTab('today', this)">🏠 امروز</button>
-        <button class="nav-item" onclick="switchTab('foods', this)">🍎 ثبت غذا</button>
-        <button class="nav-item" onclick="switchTab('profile', this)">👤 پروفایل</button>
-    </div>
+    <!-- Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('dashboard', this)"><span class="icon">📊</span>داشبورد</div>
+        <div class="nav-item" onclick="switchTab('foods', this)"><span class="icon">🥗</span>خوراکی‌ها</div>
+        <div class="nav-item" onclick="switchTab('burn', this)"><span class="icon">🔥</span>کالری‌سوزی</div>
+        <div class="nav-item" onclick="switchTab('stats', this)"><span class="icon">📈</span>آمار</div>
+        <div class="nav-item" onclick="switchTab('settings', this)"><span class="icon">⚙️</span>تنظیمات</div>
+    </nav>
 
-    <script src="script.js"></script>
+    <!-- بارگذاری دیتابیس ۲۰ هزار غذا -->
+    <script src="foods.js"></script>
+    <script>
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            el.classList.add('active');
+            if(tabName === 'foods') renderFoods();
+        }
+
+        function renderFoods() {
+            const query = document.getElementById('food-search').value.trim().toLowerCase();
+            const listEl = document.getElementById('food-list');
+            const foods = window.FOODS_DATABASE || [];
+            
+            const filtered = foods.filter(f => f.name.toLowerCase().includes(query)).slice(0, 30);
+            
+            if(filtered.length === 0) {
+                listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub); padding: 20px;">غذایی یافت نشد</p>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(f => `
+                <div class="food-item">
+                    <div class="food-info">
+                        <div class="name">${f.name}</div>
+                        <div class="details">پروتئین: ${f.protein}g | کربو: ${f.carbs}g | چربی: ${f.fat}g</div>
+                    </div>
+                    <div class="food-cal">${f.calories} کالری</div>
+                </div>
+            `).join('');
+        }
+    </script>
 </body>
 </html>
