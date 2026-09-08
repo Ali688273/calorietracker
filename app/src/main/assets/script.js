@@ -1,5 +1,5 @@
 // ==========================================
-// ۱. دیتابیس آفلاین خوراکی‌ها (جامع و کامل)
+// ۱. دیتابیس آفلاین خوراکی‌ها (جامع و کامل + سبزیجات و میوه‌های جدید)
 // ==========================================
 const OFFLINE_FOODS_DB = [
     // نان و غلات
@@ -48,7 +48,7 @@ const OFFLINE_FOODS_DB = [
     { id: "f39", name: "ماست کم‌چرب", cal: 55, unit: "100 گرم" },
     { id: "f40", name: "پنیر سفید", cal: 210, unit: "100 گرم" },
 
-    // میوه‌ها و صیفی‌جات
+    // میوه‌ها (تکمیل شده و کامل)
     { id: "f41", name: "سیب", cal: 52, unit: "100 گرم" },
     { id: "f42", name: "موز", cal: 89, unit: "100 گرم" },
     { id: "f43", name: "پرتقال", cal: 47, unit: "100 گرم" },
@@ -58,7 +58,33 @@ const OFFLINE_FOODS_DB = [
     { id: "f47", name: "خرما", cal: 282, unit: "100 گرم" },
     { id: "f48", name: "گردو", cal: 654, unit: "100 گرم" },
     { id: "f49", name: "بادام", cal: 579, unit: "100 گرم" },
-    { id: "f50", name: "پسته", cal: 560, unit: "100 گرم" }
+    { id: "f50", name: "پسته", cal: 560, unit: "100 گرم" },
+    { id: "f51", name: "توت فرنگی", cal: 32, unit: "100 گرم" },
+    { id: "f52", name: "انگور", cal: 69, unit: "100 گرم" },
+    { id: "f53", name: "گیلاس", cal: 50, unit: "100 گرم" },
+    { id: "f54", name: "آلبالو", cal: 50, unit: "100 گرم" },
+    { id: "f55", name: "هلو", cal: 39, unit: "100 گرم" },
+    { id: "f56", name: "زردآلو", cal: 48, unit: "100 گرم" },
+    { id: "f57", name: "کیوی", cal: 61, unit: "100 گرم" },
+    { id: "f58", name: "انار", cal: 83, unit: "100 گرم" },
+    { id: "f59", name: "انجیر تازه", cal: 74, unit: "100 گرم" },
+    { id: "f60", name: "خربزه / طالبی", cal: 34, unit: "100 گرم" },
+    { id: "f61", name: "گلابی", cal: 57, unit: "100 گرم" },
+    { id: "f62", name: "آناناس", cal: 50, unit: "100 گرم" },
+
+    // سبزیجات (افزوده شده)
+    { id: "f63", name: "کلم بروکلی", cal: 34, unit: "100 گرم" },
+    { id: "f64", name: "کاهو", cal: 15, unit: "100 گرم" },
+    { id: "f65", name: "اسفناج", cal: 23, unit: "100 گرم" },
+    { id: "f66", name: "هویج", cal: 41, unit: "100 گرم" },
+    { id: "f67", name: "قارچ", cal: 22, unit: "100 گرم" },
+    { id: "f68", name: "فلفل دلمه‌ای", cal: 20, unit: "100 گرم" },
+    { id: "f69", name: "کدو سبز", cal: 17, unit: "100 گرم" },
+    { id: "f70", name: "بادمجان", cal: 25, unit: "100 گرم" },
+    { id: "f71", name: "پیاز", cal: 40, unit: "100 گرم" },
+    { id: "f72", name: "کرفس", cal: 16, unit: "100 گرم" },
+    { id: "f73", name: "گل کلم", cal: 25, unit: "100 گرم" },
+    { id: "f74", name: "سبزی خوردن", cal: 20, unit: "100 گرم" }
 ];
 
 // ==========================================
@@ -132,6 +158,7 @@ let searchDebounceTimeout = null;
 let currentChartFilter = 'weekly';
 
 let userData = {
+    isRegistered: false,
     gender: 'male',
     age: 25,
     height: 175,
@@ -146,7 +173,7 @@ let userData = {
 };
 
 // ==========================================
-// ۴. راه‌اندازی و مدیریت برنامه
+// ۴. راه‌اندازی، ثبت ذخیره و ورود اولیه
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     loadUserData();
@@ -154,8 +181,27 @@ document.addEventListener("DOMContentLoaded", () => {
     renderFoodList(allFoods);
     renderWorkoutList(allWorkouts);
     updateDashboard();
-    syncSettingsInputs();
+
+    // چک کردن ثبت‌نام اولیه
+    if (!userData.isRegistered) {
+        showOnboardingModal();
+    }
 });
+
+function loadUserData() {
+    const saved = localStorage.getItem('fit_user_data');
+    if (saved) {
+        try {
+            userData = { ...userData, ...JSON.parse(saved) };
+        } catch (e) {
+            console.error("خطا در خواندن اطلاعات کاربر", e);
+        }
+    }
+}
+
+function saveUserData() {
+    localStorage.setItem('fit_user_data', JSON.stringify(userData));
+}
 
 function checkDailyReset() {
     const today = new Date().toLocaleDateString('fa-IR');
@@ -168,7 +214,101 @@ function checkDailyReset() {
     }
 }
 
-// --- جستجوی هوشمند غذا (آنلاین + آفلاین با کنترل Debounce) ---
+// --- فرم و مودال ثبت نام اولیه (Onboarding) ---
+function showOnboardingModal() {
+    let modal = document.getElementById("modal-onboarding");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "modal-onboarding";
+        modal.className = "modal active";
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 400px; padding: 20px; border-radius: 12px; background: var(--bg-card, #1e293b); color: #fff;">
+                <h2 style="text-align: center; margin-bottom: 15px; font-size: 1.2rem;">خوش آمدید! ثبت اطلاعات اولیه</h2>
+                <p style="font-size: 0.85rem; color: #94a3b8; text-align: center; margin-bottom: 20px;">برای محاسبه میزان BMR و BMI دقیق، اطلاعات زیر را وارد کنید:</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label style="font-size:0.8rem;">جنسیت:</label>
+                        <select id="onboard-gender" style="width:100%; padding:8px; border-radius:6px; margin-top:4px;">
+                            <option value="male">مرد</option>
+                            <option value="female">زن</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">سن (سال):</label>
+                        <input type="number" id="onboard-age" value="25" style="width:100%; padding:8px; border-radius:6px; margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">قد (سانتی‌متر):</label>
+                        <input type="number" id="onboard-height" value="175" style="width:100%; padding:8px; border-radius:6px; margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">وزن فعلی (کیلوگرم):</label>
+                        <input type="number" id="onboard-weight" value="70" style="width:100%; padding:8px; border-radius:6px; margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">میزان فعالیت روزانه:</label>
+                        <select id="onboard-activity" style="width:100%; padding:8px; border-radius:6px; margin-top:4px;">
+                            <option value="1.2">بی‌تحرک (کار المان/نشسته)</option>
+                            <option value="1.375">فعالیت کم (ورزش 1 الی 3 روز در هفته)</option>
+                            <option value="1.55">فعالیت متوسط (ورزش 3 الی 5 روز در هفته)</option>
+                            <option value="1.725">فعالیت زیاد (ورزش 6 الی 7 روز در هفته)</option>
+                        </select>
+                    </div>
+                    <button onclick="saveOnboardingData()" style="width:100%; padding:10px; background:#10b981; border:none; border-radius:6px; color:#fff; font-weight:bold; margin-top:10px; cursor:pointer;">ثبت و شروع برنامه</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    } else {
+        modal.classList.add("active");
+    }
+}
+
+function saveOnboardingData() {
+    const gender = document.getElementById("onboard-gender").value;
+    const age = parseInt(document.getElementById("onboard-age").value) || 25;
+    const height = parseFloat(document.getElementById("onboard-height").value) || 175;
+    const weight = parseFloat(document.getElementById("onboard-weight").value) || 70;
+    const activity = parseFloat(document.getElementById("onboard-activity").value) || 1.2;
+
+    userData.gender = gender;
+    userData.age = age;
+    userData.height = height;
+    userData.weight = weight;
+    userData.activity = activity;
+    userData.isRegistered = true;
+
+    // محاسبه اولیه BMR
+    calculateBMR();
+
+    // ذخیره سابقه وزن اولیه
+    userData.weightsHistory = [{
+        id: Date.now(),
+        weight: weight,
+        date: new Date().toLocaleDateString('fa-IR')
+    }];
+
+    saveUserData();
+
+    const modal = document.getElementById("modal-onboarding");
+    if (modal) modal.classList.remove("active");
+
+    updateDashboard();
+    syncSettingsInputs();
+}
+
+function calculateBMR() {
+    let bmr = 0;
+    if (userData.gender === 'male') {
+        bmr = 88.362 + (13.397 * userData.weight) + (4.799 * userData.height) - (5.677 * userData.age);
+    } else {
+        bmr = 447.593 + (9.247 * userData.weight) + (3.098 * userData.height) - (4.330 * userData.age);
+    }
+    userData.bmr = Math.round(bmr * userData.activity);
+}
+
+// --- جستجوی هوشمند غذا (آنلاین + آفلاین) ---
 function handleFoodSearch() {
     const query = document.getElementById('food-search').value.trim();
     if (!query) {
@@ -176,11 +316,9 @@ function handleFoodSearch() {
         return;
     }
 
-    // ۱. نتایج محلی (آفلاین)
     const localResults = allFoods.filter(f => f.name.toLowerCase().includes(query.toLowerCase()));
     renderFoodList(localResults);
 
-    // ۲. نتایج آنلاین (با تایمر نیم ثانیه‌ای)
     clearTimeout(searchDebounceTimeout);
     if (navigator.onLine && query.length >= 3) {
         searchDebounceTimeout = setTimeout(async () => {
@@ -358,6 +496,7 @@ function calculateAndRenderBMI() {
 // ==========================================
 function submitNewWeight() {
     const input = document.getElementById("new-weight-input");
+    if (!input) return;
     const newW = parseFloat(input.value);
 
     if (newW && newW > 0) {
@@ -370,6 +509,7 @@ function submitNewWeight() {
             date: new Date().toLocaleDateString('fa-IR')
         });
 
+        calculateBMR();
         saveUserData();
         input.value = "";
         
@@ -386,6 +526,7 @@ function removeWeightRecord(id) {
     if (userData.weightsHistory.length > 0) {
         userData.weight = userData.weightsHistory[userData.weightsHistory.length - 1].weight;
     }
+    calculateBMR();
     saveUserData();
     calculateAndRenderBMI();
     renderWeightChart();
@@ -468,30 +609,47 @@ function renderWeightChart() {
 }
 
 // ==========================================
-// ۸. مودال‌ها و عملیات افزودن
+// ۸. مودال‌ها و افزودن آیتم به روزمرگی
 // ==========================================
+function openModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.classList.add('active');
+}
+
+function closeModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.classList.remove('active');
+}
+
 function openItemModal(item, type) {
     selectedItem = { ...item, type };
-    document.getElementById('modal-item-title').innerText = item.name;
-    const label = document.getElementById('modal-item-unit-label');
-    const input = document.getElementById('modal-item-amount');
+    const titleEl = document.getElementById('modal-item-title');
+    const labelEl = document.getElementById('modal-item-unit-label');
+    const inputEl = document.getElementById('modal-item-amount');
+    
+    if (titleEl) titleEl.innerText = item.name;
     
     if (type === 'food') {
-        label.innerText = "مقدار مصرفی (گرم):";
-        input.value = 100;
+        if (labelEl) labelEl.innerText = "مقدار مصرفی (گرم):";
+        if (inputEl) inputEl.value = 100;
     } else {
-        label.innerText = "مدت زمان (دقیقه):";
-        input.value = 30;
+        if (labelEl) labelEl.innerText = "مدت زمان (دقیقه):";
+        if (inputEl) inputEl.value = 30;
     }
     openModal('modal-item');
 }
 
 function confirmAddItem() {
-    const amount = parseFloat(document.getElementById('modal-item-amount').value) || 0;
-    if (amount <= 0 || !selectedItem) return;
+    const amountInput = document.getElementById('modal-item-amount');
+    const amount = parseFloat(amountInput ? amountInput.value : 0) || 0;
+
+    if (amount <= 0 || !selectedItem) {
+        closeModal('modal-item');
+        return;
+    }
 
     if (selectedItem.type === 'food') {
-        const addedCal = Math.round((selectedItem.cal / 100) * amount);
+        const addedCal = Math.round((selectedItem.cal * amount) / 100);
         userData.consumed += addedCal;
     } else if (selectedItem.type === 'workout') {
         const burnedCal = Math.round(selectedItem.calPerMin * amount);
@@ -499,103 +657,34 @@ function confirmAddItem() {
     }
 
     saveUserData();
+    updateDashboard();
     closeModal('modal-item');
 }
 
-function openCustomFoodModal() { openModal("modal-custom-food"); }
-function saveCustomFood() {
-    const name = document.getElementById("custom-food-name").value.trim();
-    const cal = parseFloat(document.getElementById("custom-food-cal").value);
-    if (name && cal) {
-        const newFood = { id: `custom_${Date.now()}`, name, cal, unit: "100 گرم" };
-        allFoods.unshift(newFood);
-        renderFoodList(allFoods);
-        closeModal("modal-custom-food");
-        document.getElementById("custom-food-name").value = "";
-        document.getElementById("custom-food-cal").value = "";
-    }
-}
-
-function openCustomWorkoutModal() { openModal("modal-custom-workout"); }
-function saveCustomWorkout() {
-    const name = document.getElementById("custom-workout-name").value.trim();
-    const calPerMin = parseFloat(document.getElementById("custom-workout-cal").value);
-    if (name && calPerMin) {
-        const newWorkout = { id: `custom_w_${Date.now()}`, name, calPerMin };
-        allWorkouts.unshift(newWorkout);
-        renderWorkoutList(allWorkouts);
-        closeModal("modal-custom-workout");
-        document.getElementById("custom-workout-name").value = "";
-        document.getElementById("custom-workout-cal").value = "";
-    }
-}
-
-function addWater(amount) {
-    userData.water = Math.max(0, userData.water + amount);
+function updateWater(change) {
+    userData.water = Math.max(0, userData.water + change);
     saveUserData();
-}
-
-// ==========================================
-// ۹. توابع ذخیره و برنامه‌ریزی داده‌ها
-// ==========================================
-function updateDashboard() {
-    document.getElementById('consumed-cal').innerText = userData.consumed;
-    document.getElementById('burned-cal').innerText = userData.burned;
-    
-    const remaining = userData.bmr - userData.consumed + userData.burned;
-    document.getElementById('remaining-cal').innerText = remaining;
-    document.getElementById('water-count').innerText = `${userData.water} از 8 لیوان 💧`;
-}
-
-function calculateBMR() {
-    let bmr = 0;
-    if (userData.gender === 'male') {
-        bmr = (10 * userData.weight) + (6.25 * userData.height) - (5 * userData.age) + 5;
-    } else {
-        bmr = (10 * userData.weight) + (6.25 * userData.height) - (5 * userData.age) - 161;
-    }
-    userData.bmr = Math.round(bmr * parseFloat(userData.activity));
-}
-
-function loadUserData() {
-    const saved = localStorage.getItem('user_health_data');
-    if (saved) {
-        userData = { ...userData, ...JSON.parse(saved) };
-    }
-    calculateBMR();
-}
-
-function saveUserData() {
-    calculateBMR();
-    localStorage.setItem('user_health_data', JSON.stringify(userData));
     updateDashboard();
 }
 
+function updateDashboard() {
+    const consumedEl = document.getElementById('dashboard-consumed');
+    const burnedEl = document.getElementById('dashboard-burned');
+    const targetEl = document.getElementById('dashboard-target');
+    const waterEl = document.getElementById('dashboard-water');
+
+    if (consumedEl) consumedEl.innerText = userData.consumed;
+    if (burnedEl) burnedEl.innerText = userData.burned;
+    if (targetEl) targetEl.innerText = userData.bmr;
+    if (waterEl) waterEl.innerText = userData.water;
+}
+
 function syncSettingsInputs() {
-    if (document.getElementById("user-gender")) document.getElementById("user-gender").value = userData.gender;
-    if (document.getElementById("user-age")) document.getElementById("user-age").value = userData.age;
-    if (document.getElementById("user-height")) document.getElementById("user-height").value = userData.height;
-    if (document.getElementById("user-weight")) document.getElementById("user-weight").value = userData.weight;
-    if (document.getElementById("user-activity")) document.getElementById("user-activity").value = userData.activity;
-}
+    const ageIn = document.getElementById('settings-age');
+    const heightIn = document.getElementById('settings-height');
+    const weightIn = document.getElementById('settings-weight');
 
-function saveProfileFromSettings() {
-    userData.gender = document.getElementById("user-gender").value;
-    userData.age = parseFloat(document.getElementById("user-age").value) || 25;
-    userData.height = parseFloat(document.getElementById("user-height").value) || 175;
-    userData.weight = parseFloat(document.getElementById("user-weight").value) || 70;
-    userData.activity = parseFloat(document.getElementById("user-activity").value) || 1.2;
-
-    saveUserData();
-    alert("تنظیمات با موفقیت به‌روزرسانی شد.");
-}
-
-function openModal(id) {
-    const m = document.getElementById(id);
-    if (m) m.style.display = 'flex';
-}
-
-function closeModal(id) {
-    const m = document.getElementById(id);
-    if (m) m.style.display = 'none';
+    if (ageIn) ageIn.value = userData.age;
+    if (heightIn) heightIn.value = userData.height;
+    if (weightIn) weightIn.value = userData.weight;
 }
