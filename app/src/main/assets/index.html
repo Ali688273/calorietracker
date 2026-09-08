@@ -324,7 +324,6 @@
 
         <!-- خوراکی‌ها -->
         <div id="tab-foods" class="tab-content">
-            <div id="food-count-notice" class="notice-banner">در حال بارگذاری بانک اطلاعاتی...</div>
             <input type="text" id="food-search" class="search-box" placeholder="جستجو (مثلاً: نان، سیب، جوجه)..." oninput="handleFoodSearch()">
             
             <button class="btn btn-sub" style="width: 100%; margin-bottom: 12px;" onclick="openCustomFoodModal()">+ افزودن خوراکی دستی (اگر در لیست نبود)</button>
@@ -334,17 +333,26 @@
 
         <!-- کالری‌سوزی -->
         <div id="tab-workouts" class="tab-content">
-            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی فعالیت یا ورزش..." oninput="renderWorkouts()">
+            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی فعالیت یا ورزش..." oninput="handleWorkoutSearch()">
+            
+            <button class="btn btn-sub" style="width: 100%; margin-bottom: 12px;" onclick="openCustomWorkoutModal()">+ افزودن فعالیت دستی (اگر در لیست نبود)</button>
+
             <div id="workout-list"></div>
         </div>
 
-        <!-- آمار -->
+        <!-- آمار و وزن -->
         <div id="tab-stats" class="tab-content">
             <div class="card">
-                <div class="card-title">روند مصرف کالری</div>
-                <p style="text-align: center; color: var(--text-sub); font-size: 0.85rem; padding: 20px 0;">
-                    ثبت داده‌های روزانه در این بخش محاسبه خواهد شد.
-                </p>
+                <div class="card-title">ثبت وزن جدید</div>
+                <div class="form-group">
+                    <input type="number" id="new-weight-input" placeholder="وزن امروز (کیلوگرم)">
+                </div>
+                <button class="btn" style="width: 100%;" onclick="submitNewWeight()">ثبت وزن</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">تاریخچه وزن</div>
+                <div id="weight-history-list"></div>
             </div>
         </div>
 
@@ -439,6 +447,25 @@
             <div class="modal-actions">
                 <button class="btn btn-sub" onclick="closeModal('modal-custom-food')">انصراف</button>
                 <button class="btn" onclick="saveCustomFood()">افزودن به لیست</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال افزودن دستی ورزش -->
+    <div id="modal-custom-workout" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 12px; font-size: 1rem;">افزودن فعالیت ورزشی جدید</h3>
+            <div class="form-group">
+                <label>نام فعالیت</label>
+                <input type="text" id="custom-workout-name" placeholder="مثلاً: کاراته">
+            </div>
+            <div class="form-group">
+                <label>کالری‌سوزی در دقیقه</label>
+                <input type="number" id="custom-workout-cal" placeholder="مثلاً: 8">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-sub" onclick="closeModal('modal-custom-workout')">انصراف</button>
+                <button class="btn" onclick="saveCustomWorkout()">افزودن به لیست</button>
             </div>
         </div>
     </div>
