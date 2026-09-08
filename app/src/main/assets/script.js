@@ -1,4 +1,4 @@
-// تابع نرمال‌سازی حروف فارسی
+// تابع نرمال‌سازی و اصلاح حروف فارسی
 function fixPersian(str) {
     if (!str) return '';
     return str.toString()
@@ -8,12 +8,18 @@ function fixPersian(str) {
         .replace(/أ/g, 'ا')
         .replace(/إ/g, 'ا')
         .replace(/ۀ/g, 'ه')
-        .replace(/َ|ُ|ِ|ً|ٌ|ٍ|ّ/g, '') // حذف اعراب
+        .replace(/َ|ُ|ِ|ً|ٌ|ٍ|ّ/g, '')
         .toLowerCase()
         .trim();
 }
 
-// وضعیت و داده‌های برنامه
+// بررسی اینکه آیا متن شامل حروف فارسی است یا خیر
+function isPersianText(str) {
+    const persianRegex = /^[\u0600-\u06FF\s0-9\u0660-\u0669\u06F0-\u06F9]+$/;
+    return persianRegex.test(str);
+}
+
+// وضعیت و داده‌های ذخیره‌شده
 let userState = JSON.parse(localStorage.getItem('cal_user_state')) || null;
 let customFoods = JSON.parse(localStorage.getItem('cal_custom_foods')) || [];
 let customWorkouts = JSON.parse(localStorage.getItem('cal_custom_workouts')) || [];
@@ -24,7 +30,6 @@ let selectedItemForAdd = null;
 let isWorkoutMode = false;
 let searchTimeout = null;
 
-// تاریخ امروز به فرمت YYYY-MM-DD
 function getTodayString() {
     const d = new Date();
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -40,7 +45,7 @@ if (!todayData || todayData.date !== todayStr) {
     localStorage.setItem('cal_today_data', JSON.stringify(todayData));
 }
 
-// بانک خوراکی‌های پایه
+// بانک اطلاعاتی خوراکی‌های پایه
 const baseFoodsList = [
     { name: "برنج سفید کته / پلو", category: "غلات", cal: 130 },
     { name: "برنج زعفرانی با کره", category: "غلات", cal: 170 },
@@ -49,7 +54,6 @@ const baseFoodsList = [
     { name: "شیر کم‌چرب", category: "لبنیات", cal: 42 },
     { name: "شیر پرچرب", category: "لبنیات", cal: 62 },
     { name: "کره حیوانى", category: "چربی و روغن", cal: 717 },
-    { name: "کره گیاهی (مارگارین)", category: "چربی و روغن", cal: 717 },
     { name: "نان سنگک", category: "نان", cal: 259 },
     { name: "نان بربری", category: "نان", cal: 265 },
     { name: "نان لواش", category: "نان", cal: 290 },
@@ -74,7 +78,7 @@ const baseFoodsList = [
     { name: "گوجه فرنگی", category: "میوه و سبزی", cal: 18 }
 ];
 
-// بانک فعالیت‌های کالری‌سوزی پایه
+// بانک اطلاعاتی فعالیت‌های ورزشی پایه
 const baseWorkoutsList = [
     { name: "پیاده‌روی معمولی", category: "سبک", calPerMin: 4.5 },
     { name: "پیاده‌روی تند", category: "هوازی", calPerMin: 6.5 },
@@ -106,21 +110,50 @@ function initDatabase() {
     ];
 }
 
+// ۵. بازنشانی روزانه و بررسی عملکرد روز قبل (تشویق یا تذکر)
 function checkAndResetDailyData() {
     const currentToday = getTodayString();
     if (todayData.date !== currentToday) {
-        historyLogs[todayData.date] = {
-            consumed: todayData.consumed,
-            burned: todayData.burned
-        };
+        const lastConsumed = todayData.consumed || 0;
+        const lastBurned = todayData.burned || 0;
+        const lastTarget = (userState && userState.tdee) ? userState.tdee : 2000;
+        const netConsumed = lastConsumed - lastBurned;
+
+        historyLogs[todayData.date] = { consumed: lastConsumed, burned: lastBurned };
         localStorage.setItem('cal_history_logs', JSON.stringify(historyLogs));
+
+        // نمایش پیام تشویقی یا تذکر برای روز گذشته
+        setTimeout(() => {
+            if (lastConsumed > 0) {
+                if (netConsumed <= lastTarget) {
+                    alert(`🎉 آفرین! شما دیروز عملکرد عالی داشتید و میزان کالری مصرفی شما (${netConsumed} کالری) کمتر از حد مجاز (${lastTarget} کالری) بود.`);
+                } else {
+                    alert(`⚠️ توجه: دیروز ${netConsumed - lastTarget} کالری بیشتر از حد مجاز مصرف کردید. امروز بیشتر مراقب باشید!`);
+                }
+            }
+        }, 1000);
 
         todayData = { date: currentToday, consumed: 0, burned: 0, water: 0 };
         localStorage.setItem('cal_today_data', JSON.stringify(todayData));
     }
 }
 
+// مدیریت دکمه برگشت گوشی (جلوگیری از خروج ناگهانی از برنامه)
+function setupBackButtonHandler() {
+    history.pushState({ page: 'dashboard' }, '');
+    window.onpopstate = function (event) {
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab && activeTab.id !== 'tab-dashboard') {
+            switchTab('dashboard', document.querySelectorAll('.nav-item')[0]);
+            history.pushState({ page: 'dashboard' }, '');
+        } else {
+            history.back();
+        }
+    };
+}
+
 function initApp() {
+    setupBackButtonHandler();
     checkAndResetDailyData();
     initDatabase();
 
@@ -137,7 +170,7 @@ function initApp() {
     renderWeightHistory();
 }
 
-// محاسبه BMI و ارائه گزارش وضعیت وزن
+// ۱. تحلیل دقیق BMI و محاسبه میزان اضافه/کمبود وزن
 function analyzeWeightStatus(weight, height) {
     const heightM = height / 100;
     const bmi = (weight / (heightM * heightM)).toFixed(1);
@@ -149,16 +182,19 @@ function analyzeWeightStatus(weight, height) {
 
     if (bmi < 18.5) {
         status = 'کمبود وزن (لاغر)';
-        advice = `شما به حدود **${minIdeal - weight} کیلوگرم** افزایش وزن نیاز دارید تا به حد نرمال برسید.`;
+        const diff = Math.round(minIdeal - weight);
+        advice = `شما به حدود **${diff} کیلوگرم** افزایش وزن نیاز دارید تا به وزن نرمال برسید.`;
     } else if (bmi <= 24.9) {
         status = 'وزن نرمال و ایده‌آل';
         advice = `وزن شما کاملاً مناسب است (محدوده ایده‌آل: ${minIdeal} تا ${maxIdeal} کیلوگرم).`;
     } else if (bmi <= 29.9) {
         status = 'اضافه وزن';
-        advice = `شما برای رسیدن به وزن نرمال باید حدود **${weight - maxIdeal} کیلوگرم** وزن کم کنید.`;
+        const diff = Math.round(weight - maxIdeal);
+        advice = `شما برای رسیدن به وزن ایده‌آل باید حدود **${diff} کیلوگرم** وزن کم کنید.`;
     } else {
         status = 'چاقی';
-        advice = `شما در محدوده چاقی هستید. پیشنهاد می‌شود **${weight - maxIdeal} کیلوگرم** کاهش وزن داشته باشید.`;
+        const diff = Math.round(weight - maxIdeal);
+        advice = `شما در محدوده چاقی هستید و پیشنهاد می‌شود **${diff} کیلوگرم** کاهش وزن داشته باشید.`;
     }
 
     return { bmi, status, advice };
@@ -180,6 +216,7 @@ function calculateTDEE() {
     return userState.tdee;
 }
 
+// ثبت‌نام و نمایش بلافاصله اطلاعات BMI و اضافه وزن
 function submitOnboarding() {
     const weight = parseFloat(document.getElementById('init-weight').value) || 70;
     const height = parseFloat(document.getElementById('init-height').value) || 175;
@@ -200,7 +237,7 @@ function submitOnboarding() {
     updateDashboard();
 
     const res = analyzeWeightStatus(weight, height);
-    alert(`📊 نتیجه بررسی وضعیت بدنی شما:\n\n• شاخص BMI: ${res.bmi}\n• وضعیت: ${res.status}\n\n💡 ${res.advice.replace(/\*\*/g, '')}`);
+    alert(`📊 نتیجه آنالیز بدنی شما:\n\n• شاخص BMI شما: ${res.bmi}\n• وضعیت: ${res.status}\n\n💡 ${res.advice.replace(/\*\*/g, '')}`);
 }
 
 function saveProfileFromSettings() {
@@ -220,7 +257,7 @@ function saveProfileFromSettings() {
     updateDashboard();
 
     const res = analyzeWeightStatus(weight, height);
-    alert(`اطلاعات ذخیره شد!\n\n📊 شاخص BMI: ${res.bmi}\n• وضعیت: ${res.status}\n💡 ${res.advice.replace(/\*\*/g, '')}`);
+    alert(`اطلاعات به‌روزرسانی شد!\n\n📊 شاخص BMI: ${res.bmi}\n• وضعیت: ${res.status}\n💡 ${res.advice.replace(/\*\*/g, '')}`);
 }
 
 function updateProfileInputs() {
@@ -252,7 +289,7 @@ function addWater(val) {
     updateDashboard();
 }
 
-// سیستم جدید جستجوی ترکیبی: محلی + آنلاین (دیتابیس جامع ۱۰,۰۰۰+ غذا)
+// ۲. جستجوی آنلاین بهینه‌شده (فقط نتایج و غذاهای فارسی)
 function handleFoodSearch() {
     const rawQuery = document.getElementById('food-search').value;
     const query = fixPersian(rawQuery);
@@ -262,62 +299,59 @@ function handleFoodSearch() {
         return;
     }
 
-    // ۱. نتایج محلی
     let localResults = allFoods.filter(f => fixPersian(f.name).includes(query));
     renderFoods(localResults);
 
-    // ۲. اجرای جستجوی آنلاین با تأخیر کوتاه‌مدت (Debounce)
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
         fetchOnlineFoods(query, localResults);
     }, 400);
 }
 
-// تابع دریافت ۱۰ هزار غذا از سرور جهانی OpenFoodFacts
 async function fetchOnlineFoods(query, existingLocalResults) {
     const listEl = document.getElementById('food-list');
     if (!listEl) return;
 
-    // نمایش علامت در حال جستجوی آنلاین
-    const loadingDiv = document.createElement('div');
-    loadingDiv.id = 'search-loading';
-    loadingDiv.style.cssText = 'text-align:center; padding:10px; color:#4CAF50; font-size:0.9rem;';
-    loadingDiv.innerText = '🌐 در حال جستجو در بانک آنلاین ۱۰,۰۰۰ غذا...';
-    
-    if (!document.getElementById('search-loading')) {
-        listEl.appendChild(loadingDiv);
+    let loadingDiv = document.getElementById('search-loading');
+    if (!loadingDiv) {
+        loadingDiv = document.createElement('div');
+        loadingDiv.id = 'search-loading';
+        loadingDiv.style.cssText = 'text-align:center; padding:10px; color:#4CAF50; font-size:0.9rem;';
+        loadingDiv.innerText = '🌐 در حال دریافت نتایج آنلاین...';
+        listEl.prepend(loadingDiv);
     }
 
     try {
-        const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=20`);
+        const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=30`);
         const data = await response.json();
 
         const onlineResults = [];
         if (data && data.products) {
             data.products.forEach(prod => {
-                const name = prod.product_name_fa || prod.product_name || prod.product_name_en;
+                const name = prod.product_name_fa || (isPersianText(prod.product_name) ? prod.product_name : null);
                 const cal = prod.nutriments ? Math.round(prod.nutriments['energy-kcal_100g'] || prod.nutriments['energy-kcal'] || 0) : 0;
 
-                if (name && cal > 0) {
-                    // جلوگیری از تکراری شدن
+                // ثبت فقط غذاهایی که اسم فارسی و کالری معتبر دارند
+                if (name && cal > 0 && isPersianText(name)) {
                     const isDuplicate = existingLocalResults.some(l => fixPersian(l.name) === fixPersian(name));
                     if (!isDuplicate) {
                         onlineResults.push({
                             name: name,
                             category: "آنلاین 🌐",
-                            cal: cal,
-                            isOnline: true
+                            cal: cal
                         });
                     }
                 }
             });
         }
 
+        const lDiv = document.getElementById('search-loading');
+        if (lDiv) lDiv.remove();
+
         const combined = [...existingLocalResults, ...onlineResults];
         renderFoods(combined);
 
     } catch (err) {
-        console.log('Online search error:', err);
         const lDiv = document.getElementById('search-loading');
         if (lDiv) lDiv.remove();
     }
@@ -341,7 +375,6 @@ function renderFoods(list) {
     `).join('');
 }
 
-// هنگام انتخاب غذا (اگر آنلاین باشد، در حافظه محلی هم ذخیره می‌شود)
 function selectFoodItem(name, cal) {
     const exists = customFoods.some(f => fixPersian(f.name) === fixPersian(name));
     if (!exists && !baseFoodsList.some(b => fixPersian(b.name) === fixPersian(name))) {
@@ -352,7 +385,6 @@ function selectFoodItem(name, cal) {
     openModalWithData(name, cal, false);
 }
 
-// مدیریت جستجوی کالری‌سوزی
 function handleWorkoutSearch() {
     const query = fixPersian(document.getElementById('workout-search').value);
     if (!query) {
@@ -381,7 +413,7 @@ function renderWorkouts(list) {
     `).join('');
 }
 
-// افزودن دستی خوراکی
+// ثبت دستی خوراکی
 function openCustomFoodModal() {
     document.getElementById('modal-custom-food').style.display = 'flex';
 }
@@ -404,10 +436,10 @@ function saveCustomFood() {
 
     initDatabase();
     renderFoods(allFoods);
-    alert('خوراکی جدید اضافه شد.');
+    alert('خوراکی جدید با موفقیت اضافه شد.');
 }
 
-// افزودن دستی فعالیت ورزشی
+// ۴. ثبت دستی فعالیت ورزشی (فعال‌سازی بخش کالری‌سوزی)
 function openCustomWorkoutModal() {
     document.getElementById('modal-custom-workout').style.display = 'flex';
 }
@@ -430,10 +462,9 @@ function saveCustomWorkout() {
 
     initDatabase();
     renderWorkouts(allWorkouts);
-    alert('فعالیت ورزشی جدید اضافه شد.');
+    alert('فعالیت ورزشی جدید با موفقیت اضافه شد.');
 }
 
-// ثبت وزن جدید
 function addWeightRecord(weightVal) {
     const w = parseFloat(weightVal);
     if (isNaN(w) || w <= 0) return;
@@ -479,7 +510,6 @@ function renderWeightHistory() {
     `).join('');
 }
 
-// ثبت مصرف و تشویق
 function openModalWithData(name, val, workout) {
     isWorkoutMode = workout;
     selectedItemForAdd = { name, val };
@@ -504,9 +534,6 @@ function confirmAddItem() {
         const burned = Math.round(selectedItemForAdd.val * amount);
         todayData.burned += burned;
         msg = `🔥 عالی! ${burned} کالری سوزانده شد.`;
-        if (todayData.burned > todayData.consumed && todayData.consumed > 0) {
-            msg += `\n\n🌟 آفرین! کالری‌سوزی امروز شما از کالری دریافتی بیشتر شد!`;
-        }
     } else {
         const consumed = Math.round((selectedItemForAdd.val / 100) * amount);
         todayData.consumed += consumed;
@@ -528,6 +555,8 @@ function switchTab(tabName, el) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
     if (el) el.classList.add('active');
+
+    history.pushState({ page: tabName }, '');
 }
 
 window.onload = initApp;
