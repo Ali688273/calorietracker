@@ -1,8 +1,8 @@
 // ==========================================
-// ۱. دیتابیس کامل و جامع خوراکی‌ها (بیش از ۱7۰ نوع خوراکی)
+// ۱. دیتابیس کامل خوراکی‌ها (۱۷۳ آیتم)
 // ==========================================
 const OFFLINE_FOODS_DB = [
-    // --- نان و غلات ---
+    // نان و غلات
     { id: "f1", name: "نان سنگک", cal: 259, unit: "100 گرم" },
     { id: "f2", name: "نان بربری", cal: 265, unit: "100 گرم" },
     { id: "f3", name: "نان لواش", cal: 285, unit: "100 گرم" },
@@ -19,7 +19,7 @@ const OFFLINE_FOODS_DB = [
     { id: "f14", name: "نخود پخته", cal: 164, unit: "100 گرم" },
     { id: "f15", name: "لوبیا قرمز / چیتی پخته", cal: 127, unit: "100 گرم" },
 
-    // --- غذاهای ایرانی و سنتی ---
+    // غذاهای ایرانی و سنتی
     { id: "f16", name: "چلو کباب کوبیده", cal: 240, unit: "100 گرم" },
     { id: "f17", name: "جوجه کباب (سینه)", cal: 185, unit: "100 گرم" },
     { id: "f18", name: "کباب برگ", cal: 200, unit: "100 گرم" },
@@ -51,21 +51,21 @@ const OFFLINE_FOODS_DB = [
     { id: "f44", name: "کتلت گوشت", cal: 240, unit: "100 گرم" },
     { id: "f45", name: "شامی کباب", cal: 230, unit: "100 گرم" },
 
-    // --- گوشت، مرغ، ماهی و تخم‌مرغ ---
+    // گوشت، مرغ، ماهی و تخم‌مرغ
     { id: "f46", name: "سینه مرغ آب‌پز", cal: 165, unit: "100 گرم" },
     { id: "f47", name: "ران مرغ بدون پوست", cal: 190, unit: "100 گرم" },
     { id: "f48", name: "گوشت گوساله کم‌چرب", cal: 200, unit: "100 گرم" },
     { id: "f49", name: "گوشت گوسفندی", cal: 280, unit: "100 گرم" },
     { id: "f50", name: "ماهی قزل‌آلا", cal: 145, unit: "100 گرم" },
     { id: "f51", name: "ماهی سالمون", cal: 208, unit: "100 گرم" },
-    { id: "f52", name: "تن ماهی در روغن (کنسرو)", cal: 198, unit: "100 گرم" },
+    { id: "f52", name: "تن ماهی در روغن", cal: 198, unit: "100 گرم" },
     { id: "f53", name: "تن ماهی در آب‌نمک", cal: 116, unit: "100 گرم" },
     { id: "f54", name: "میگو پخته", cal: 99, unit: "100 گرم" },
     { id: "f55", name: "تخم مرغ آب‌پز", cal: 155, unit: "100 گرم" },
     { id: "f56", name: "تخم مرغ نیمرو", cal: 210, unit: "100 گرم" },
     { id: "f57", name: "املت گوجه‌فرنگی", cal: 140, unit: "100 گرم" },
 
-    // --- لبنیات ---
+    // لبنیات
     { id: "f58", name: "شیر کم‌چرب", cal: 42, unit: "100 گرم" },
     { id: "f59", name: "شیر پرچرب", cal: 61, unit: "100 گرم" },
     { id: "f60", name: "ماست کم‌چرب", cal: 55, unit: "100 گرم" },
@@ -73,12 +73,12 @@ const OFFLINE_FOODS_DB = [
     { id: "f62", name: "پنیر سفید صبحانه", cal: 210, unit: "100 گرم" },
     { id: "f63", name: "پنیر لاکتیکی", cal: 180, unit: "100 گرم" },
     { id: "f64", name: "پنیر خامه ای", cal: 342, unit: "100 گرم" },
-    { id: "f65", name: "پنیر پیتزا (موتزارلا)", cal: 300, unit: "100 گرم" },
+    { id: "f65", name: "پنیر پیتزا", cal: 300, unit: "100 گرم" },
     { id: "f66", name: "خامه صبحانه", cal: 340, unit: "100 گرم" },
     { id: "f67", name: "کره حیوانى", cal: 717, unit: "100 گرم" },
     { id: "f68", name: "سرشیر", cal: 380, unit: "100 گرم" },
 
-    // --- میوه‌ها و سبزیجات ---
+    // میوه‌ها و سبزیجات
     { id: "f69", name: "سیب", cal: 52, unit: "100 گرم" },
     { id: "f70", name: "موز", cal: 89, unit: "100 گرم" },
     { id: "f71", name: "پرتقال", cal: 47, unit: "100 گرم" },
@@ -113,7 +113,7 @@ const OFFLINE_FOODS_DB = [
     { id: "f100", name: "گل کلم", cal: 25, unit: "100 گرم" },
     { id: "f101", name: "سبزی خوردن", cal: 20, unit: "100 گرم" },
 
-    // --- تنقلات، آجیل و مغزیجات ---
+    // تنقلات و آجیل
     { id: "f102", name: "گردو", cal: 654, unit: "100 گرم" },
     { id: "f103", name: "بادام درختی", cal: 579, unit: "100 گرم" },
     { id: "f104", name: "پسته", cal: 560, unit: "100 گرم" },
@@ -134,7 +134,7 @@ const OFFLINE_FOODS_DB = [
     { id: "f119", name: "توت خشک", cal: 320, unit: "100 گرم" },
     { id: "f120", name: "انجیر خشک", cal: 249, unit: "100 گرم" },
 
-    // --- شیرینی‌جات، شکلات و دسر ---
+    // شیرینی‌جات و دسر
     { id: "f121", name: "شکلات تلخ 70%", cal: 598, unit: "100 گرم" },
     { id: "f122", name: "شکلات شیری", cal: 535, unit: "100 گرم" },
     { id: "f123", name: "بیسکویت ساقه طلایی", cal: 440, unit: "100 گرم" },
@@ -143,7 +143,7 @@ const OFFLINE_FOODS_DB = [
     { id: "f126", name: "پاستیل", cal: 343, unit: "100 گرم" },
     { id: "f127", name: "کیک یزدی", cal: 390, unit: "100 گرم" },
     { id: "f128", name: "شیرینی خامه ای", cal: 500, unit: "100 گرم" },
-    { id: "f129", name: "دانمارکی / شیرینی گل محمدی", cal: 420, unit: "100 گرم" },
+    { id: "f129", name: "دانمارکی", cal: 420, unit: "100 گرم" },
     { id: "f130", name: "بامیه", cal: 400, unit: "100 گرم" },
     { id: "f131", name: "زولبیا", cal: 450, unit: "100 گرم" },
     { id: "f132", name: "گز", cal: 380, unit: "100 گرم" },
@@ -161,7 +161,7 @@ const OFFLINE_FOODS_DB = [
     { id: "f144", name: "کره بادام زمینی", cal: 588, unit: "100 گرم" },
     { id: "f145", name: "ارده", cal: 595, unit: "100 گرم" },
 
-    // --- فست فود و ساندویچ ---
+    // فست فود
     { id: "f146", name: "پیتزا مخلوط", cal: 260, unit: "100 گرم" },
     { id: "f147", name: "پیتزا پپرونی", cal: 280, unit: "100 گرم" },
     { id: "f148", name: "پیتزا مرغ و قارچ", cal: 230, unit: "100 گرم" },
@@ -180,22 +180,22 @@ const OFFLINE_FOODS_DB = [
     { id: "f161", name: "سس مایونز", cal: 680, unit: "100 گرم" },
     { id: "f162", name: "سس کچاپ", cal: 110, unit: "100 گرم" },
 
-    // --- نوشیدنی‌ها ---
-    { id: "f163", name: "نوشابه گازدار (کولایا سفید)", cal: 42, unit: "100 گرم" },
+    // نوشیدنی‌ها
+    { id: "f163", name: "نوشابه گازدار", cal: 42, unit: "100 گرم" },
     { id: "f164", name: "دلستر / ماءالشعیر", cal: 35, unit: "100 گرم" },
     { id: "f165", name: "آبمیوه پاکتی", cal: 50, unit: "100 گرم" },
     { id: "f166", name: "شیر شکلات", cal: 80, unit: "100 گرم" },
     { id: "f167", name: "دوغ", cal: 35, unit: "100 گرم" },
-    { id: "f168", name: "قهوه ساده / اسپرسو بدون شکر", cal: 2, unit: "100 گرم" },
+    { id: "f168", name: "قهوه ساده / اسپرسو", cal: 2, unit: "100 گرم" },
     { id: "f169", name: "کاپوچینو با شکر", cal: 60, unit: "100 گرم" },
     { id: "f170", name: "نسکافه فوری آماده (3 در 1)", cal: 420, unit: "100 گرم" },
-    { id: "f171", name: "شربت زعفران / آبلیمو با شکر", cal: 180, unit: "100 گرم" },
+    { id: "f171", name: "شربت زعفران / آبلیمو", cal: 180, unit: "100 گرم" },
     { id: "f172", name: "زیتون شور", cal: 115, unit: "100 گرم" },
     { id: "f173", name: "زیتون پرورده", cal: 280, unit: "100 گرم" }
 ];
 
 // ==========================================
-// ۲. دیتابیس فعالیت‌ها و ورزش‌ها
+// ۲. دیتابیس فعالیت‌ها و ورزش‌ها (۴۳ آیتم)
 // ==========================================
 const WORKOUTS_DB = [
     { id: "w1", name: "پیاده‌روی معمولی (4 کیلومتر بر ساعت)", calPerMin: 4 },
@@ -207,7 +207,7 @@ const WORKOUTS_DB = [
     { id: "w7", name: "طناب زدن سریع", calPerMin: 13 },
     { id: "w8", name: "دوچرخه‌سواری (سرعت معمولی)", calPerMin: 7 },
     { id: "w9", name: "دوچرخه‌سواری ثابت (شدت متوسط)", calPerMin: 8 },
-    { id: "w10", name: "دوچرخه‌سواری ثابت (شدت بالا/اسپینینگ)", calPerMin: 11.5 },
+    { id: "w10", name: "دوچرخه‌سواری ثابت (اسپینینگ)", calPerMin: 11.5 },
     { id: "w11", name: "پله‌نوردی / دستگاه استپر", calPerMin: 9 },
     { id: "w12", name: "شنا (کرال سینه)", calPerMin: 9 },
     { id: "w13", name: "شنا (قورباغه)", calPerMin: 8 },
@@ -223,13 +223,13 @@ const WORKOUTS_DB = [
     { id: "w23", name: "بدمینتون", calPerMin: 5.5 },
     { id: "w24", name: "پادلبورد / قایقرانی", calPerMin: 6 },
     { id: "w25", name: "بدنسازی با وزنه (سبک/متوسط)", calPerMin: 5 },
-    { id: "w26", name: "بدنسازی سنگین (پاورلیفتینگ/پرورشی)", calPerMin: 7.5 },
+    { id: "w26", name: "بدنسازی سنگین (پاورلیفتینگ)", calPerMin: 7.5 },
     { id: "w27", name: "تمرینات وزن بدن (شنا، بارفیکس، اسکات)", calPerMin: 6.5 },
     { id: "w28", name: "کراس‌فیت (CrossFit)", calPerMin: 12 },
     { id: "w29", name: "تمرینات تاباتا / HIIT", calPerMin: 11 },
     { id: "w30", name: "تمرین با کتلبل (Kettlebell)", calPerMin: 10 },
     { id: "w31", name: "بوکس (مبارزه/کیسه زدن)", calPerMin: 10.5 },
-    { id: "w32", name: "هنرهای رزمی (کاراته/تکواندو/جودو)", calPerMin: 9 },
+    { id: "w32", name: "هنرهای رزمی (کاراته/تکواندو)", calPerMin: 9 },
     { id: "w33", name: "کیک بوکسینگ", calPerMin: 10 },
     { id: "w34", name: "یوگا (قدرتی/وینیاسا)", calPerMin: 4.5 },
     { id: "w35", name: "یوگا (آرامش‌بخش)", calPerMin: 2.5 },
@@ -244,11 +244,12 @@ const WORKOUTS_DB = [
 ];
 
 // ==========================================
-// ۳. وضعیت کاربر و ساختار داده
+// ۳. وضعیت و متغیرهای اصلی
 // ==========================================
-let allFoods = [...OFFLINE_FOODS_DB];
-let allWorkouts = [...WORKOUTS_DB];
+let customFoods = [];
+let customWorkouts = [];
 let selectedItem = null;
+let weightChartInstance = null;
 
 let userData = {
     isRegistered: false,
@@ -262,72 +263,45 @@ let userData = {
     burned: 0,
     water: 0,
     lastDate: new Date().toLocaleDateString('fa-IR'),
-    weightsHistory: []
+    weightHistory: [] // { date: '1402/01/01', weight: 70 }
 };
 
 // ==========================================
-// ۴. مدیریت ثبت نام اولیه و محاسبه BMR
+// ۴. سوئیچ بین تب‌ها (مدیریت کامل)
 // ==========================================
-function renderOnboardingModal() {
-    let modal = document.getElementById("modal-onboarding");
-    if (!modal) {
-        modal = document.createElement("div");
-        modal.id = "modal-onboarding";
-        modal.className = "modal";
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2 style="text-align: center; margin-bottom: 12px; font-size: 1.2rem;">خوش آمدید! ثبت اطلاعات اولیه</h2>
-                <p style="font-size: 0.85rem; color: #94a3b8; text-align: center; margin-bottom: 20px;">جهت محاسبه کالری پایه (BMR) اطلاعات خود را وارد کنید:</p>
-                
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div>
-                        <label style="font-size:0.8rem; display:block; margin-bottom:4px;">جنسیت:</label>
-                        <select id="onboard-gender" style="width:100%; padding:10px; border-radius:8px;">
-                            <option value="male">مرد</option>
-                            <option value="female">زن</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:0.8rem; display:block; margin-bottom:4px;">سن (سال):</label>
-                        <input type="number" id="onboard-age" value="25" style="width:100%; padding:10px; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="font-size:0.8rem; display:block; margin-bottom:4px;">قد (سانتی‌متر):</label>
-                        <input type="number" id="onboard-height" value="175" style="width:100%; padding:10px; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="font-size:0.8rem; display:block; margin-bottom:4px;">وزن فعلی (کیلوگرم):</label>
-                        <input type="number" id="onboard-weight" value="70" style="width:100%; padding:10px; border-radius:8px;">
-                    </div>
-                    <div>
-                        <label style="font-size:0.8rem; display:block; margin-bottom:4px;">میزان فعالیت روزانه:</label>
-                        <select id="onboard-activity" style="width:100%; padding:10px; border-radius:8px;">
-                            <option value="1.2">بی‌تحرک (نشسته/بدون ورزش)</option>
-                            <option value="1.375">کم (ورزش 1 الی 3 روز در هفته)</option>
-                            <option value="1.55">متوسط (ورزش 3 الی 5 روز در هفته)</option>
-                            <option value="1.725">زیاد (ورزش 6 الی 7 روز در هفته)</option>
-                        </select>
-                    </div>
-                    <button onclick="saveOnboardingData()" style="width:100%; padding:12px; background:#10b981; border:none; border-radius:8px; color:#fff; font-weight:bold; margin-top:10px; cursor:pointer; font-size:1rem;">ثبت و ورود به برنامه</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+function switchTab(tabId, el) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    const target = document.getElementById(`tab-${tabId}`);
+    if (target) {
+        target.classList.add('active');
     }
-    
-    if (!userData.isRegistered) {
-        modal.classList.add("active");
+
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+
+    if (el) {
+        el.classList.add('active');
     } else {
-        modal.classList.remove("active");
+        const defaultNav = document.querySelector(`.nav-item[onclick*="${tabId}"]`);
+        if (defaultNav) defaultNav.classList.add('active');
+    }
+
+    if (tabId === 'stats') {
+        renderStatsTab();
     }
 }
 
-function saveOnboardingData() {
-    const gender = document.getElementById("onboard-gender").value;
-    const age = parseInt(document.getElementById("onboard-age").value) || 25;
-    const height = parseFloat(document.getElementById("onboard-height").value) || 175;
-    const weight = parseFloat(document.getElementById("onboard-weight").value) || 70;
-    const activity = parseFloat(document.getElementById("onboard-activity").value) || 1.2;
+// ==========================================
+// ۵. ثبت نام اولیه و محاسبه BMR
+// ==========================================
+function submitOnboarding() {
+    const gender = document.getElementById('init-gender').value;
+    const age = parseInt(document.getElementById('init-age').value) || 25;
+    const height = parseFloat(document.getElementById('init-height').value) || 175;
+    const weight = parseFloat(document.getElementById('init-weight').value) || 70;
+    const activity = parseFloat(document.getElementById('init-activity').value) || 1.2;
 
     userData.gender = gender;
     userData.age = age;
@@ -336,21 +310,24 @@ function saveOnboardingData() {
     userData.activity = activity;
     userData.isRegistered = true;
 
+    // ثبت وزن اولیه در تاریخچه
+    const today = new Date().toLocaleDateString('fa-IR');
+    userData.weightHistory = [{ date: today, weight: weight }];
+
     calculateBMR();
-
-    userData.weightsHistory = [{
-        id: Date.now(),
-        weight: weight,
-        date: new Date().toLocaleDateString('fa-IR')
-    }];
-
     saveUserData();
 
-    const modal = document.getElementById("modal-onboarding");
-    if (modal) modal.classList.remove("active");
-
+    closeModal('modal-onboarding');
     updateDashboard();
     syncSettingsInputs();
+}
+
+function checkOnboarding() {
+    if (!userData.isRegistered) {
+        openModal('modal-onboarding');
+    } else {
+        closeModal('modal-onboarding');
+    }
 }
 
 function calculateBMR() {
@@ -364,57 +341,31 @@ function calculateBMR() {
 }
 
 // ==========================================
-// ۵. مدیریت بخش تنظیمات
-// ==========================================
-function saveSettings() {
-    const ageIn = document.getElementById('settings-age');
-    const heightIn = document.getElementById('settings-height');
-    const weightIn = document.getElementById('settings-weight');
-    const genderIn = document.getElementById('settings-gender');
-    const activityIn = document.getElementById('settings-activity');
-
-    if (ageIn) userData.age = parseInt(ageIn.value) || userData.age;
-    if (heightIn) userData.height = parseFloat(heightIn.value) || userData.height;
-    if (weightIn) userData.weight = parseFloat(weightIn.value) || userData.weight;
-    if (genderIn) userData.gender = genderIn.value;
-    if (activityIn) userData.activity = parseFloat(activityIn.value) || userData.activity;
-
-    calculateBMR();
-    saveUserData();
-    updateDashboard();
-    alert("تنظیمات با موفقیت بروزرسانی شد.");
-}
-
-function syncSettingsInputs() {
-    const ageIn = document.getElementById('settings-age');
-    const heightIn = document.getElementById('settings-height');
-    const weightIn = document.getElementById('settings-weight');
-    const genderIn = document.getElementById('settings-gender');
-    const activityIn = document.getElementById('settings-activity');
-
-    if (ageIn) ageIn.value = userData.age;
-    if (heightIn) heightIn.value = userData.height;
-    if (weightIn) weightIn.value = userData.weight;
-    if (genderIn) genderIn.value = userData.gender;
-    if (activityIn) activityIn.value = userData.activity;
-}
-
-// ==========================================
-// ۶. مدیریت ذخیره‌سازی و راه‌اندازی
+// ۶. مدیریت ذخیره‌سازی
 // ==========================================
 function loadUserData() {
-    const saved = localStorage.getItem('fit_user_data');
+    const saved = localStorage.getItem('fit_user_data_v2');
     if (saved) {
         try {
             userData = { ...userData, ...JSON.parse(saved) };
         } catch (e) {
-            console.error("خطا در خواندن اطلاعات", e);
+            console.error(e);
         }
+    }
+
+    const savedCustomFoods = localStorage.getItem('fit_custom_foods');
+    if (savedCustomFoods) {
+        try { customFoods = JSON.parse(savedCustomFoods); } catch (e) {}
+    }
+
+    const savedCustomWorkouts = localStorage.getItem('fit_custom_workouts');
+    if (savedCustomWorkouts) {
+        try { customWorkouts = JSON.parse(savedCustomWorkouts); } catch (e) {}
     }
 }
 
 function saveUserData() {
-    localStorage.setItem('fit_user_data', JSON.stringify(userData));
+    localStorage.setItem('fit_user_data_v2', JSON.stringify(userData));
 }
 
 function checkDailyReset() {
@@ -428,34 +379,21 @@ function checkDailyReset() {
     }
 }
 
-function initApp() {
-    loadUserData();
-    checkDailyReset();
-    renderFoodList(allFoods);
-    renderWorkoutList(allWorkouts);
-    updateDashboard();
-    syncSettingsInputs();
-    renderOnboardingModal();
+// ==========================================
+// ۷. نمایش لیست خوراکی‌ها و ورزش‌ها
+// ==========================================
+function getAllFoods() {
+    return [...customFoods, ...OFFLINE_FOODS_DB];
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initApp);
-} else {
-    initApp();
+function getAllWorkouts() {
+    return [...customWorkouts, ...WORKOUTS_DB];
 }
 
-// ==========================================
-// ۷. توابع رندر، جستجو و عملکردها
-// ==========================================
 function renderFoodList(list) {
     const container = document.getElementById('food-list');
     if (!container) return;
     container.innerHTML = '';
-
-    if (list.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:20px;">هیچ غذایی یافت نشد.</div>';
-        return;
-    }
 
     list.forEach(item => {
         const div = document.createElement('div');
@@ -464,7 +402,7 @@ function renderFoodList(list) {
         div.innerHTML = `
             <div class="item-info">
                 <div class="name">${item.name}</div>
-                <div class="details">${item.unit || '100 گرم'}</div>
+                <div class="details">${item.unit}</div>
             </div>
             <div class="item-value">+ ${item.cal} کالری</div>
         `;
@@ -476,11 +414,6 @@ function renderWorkoutList(list) {
     const container = document.getElementById('workout-list');
     if (!container) return;
     container.innerHTML = '';
-
-    if (list.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:20px;">هیچ فعالیتی یافت نشد.</div>';
-        return;
-    }
 
     list.forEach(item => {
         const div = document.createElement('div');
@@ -497,48 +430,49 @@ function renderWorkoutList(list) {
     });
 }
 
-function searchFood(query) {
-    const filtered = allFoods.filter(f => f.name.includes(query.trim()));
+function handleFoodSearch() {
+    const q = document.getElementById('food-search').value.toLowerCase().trim();
+    const filtered = getAllFoods().filter(f => f.name.toLowerCase().includes(q));
     renderFoodList(filtered);
 }
 
-function searchWorkout(query) {
-    const filtered = allWorkouts.filter(w => w.name.includes(query.trim()));
+function handleWorkoutSearch() {
+    const q = document.getElementById('workout-search').value.toLowerCase().trim();
+    const filtered = getAllWorkouts().filter(w => w.name.toLowerCase().includes(q));
     renderWorkoutList(filtered);
 }
 
+// ==========================================
+// ۸. مدیریت مودال‌ها و ثبت آیتم
+// ==========================================
 function openModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.add('active');
+    if (el) el.style.display = 'flex';
 }
 
 function closeModal(modalId) {
     const el = document.getElementById(modalId);
-    if (el) el.classList.remove('active');
+    if (el) el.style.display = 'none';
 }
 
 function openItemModal(item, type) {
     selectedItem = { ...item, type };
-    const titleEl = document.getElementById('modal-item-title');
-    const labelEl = document.getElementById('modal-item-unit-label');
-    const inputEl = document.getElementById('modal-item-amount');
-    
-    if (titleEl) titleEl.innerText = item.name;
-    
+    document.getElementById('modal-item-title').innerText = item.name;
+    const label = document.getElementById('modal-item-unit-label');
+    const input = document.getElementById('modal-item-amount');
+
     if (type === 'food') {
-        if (labelEl) labelEl.innerText = "مقدار مصرفی (گرم):";
-        if (inputEl) inputEl.value = 100;
+        label.innerText = 'مقدار مصرفی (گرم)';
+        input.value = 100;
     } else {
-        if (labelEl) labelEl.innerText = "مدت زمان (دقیقه):";
-        if (inputEl) inputEl.value = 30;
+        label.innerText = 'مدت زمان (دقیقه)';
+        input.value = 30;
     }
     openModal('modal-item');
 }
 
 function confirmAddItem() {
-    const amountInput = document.getElementById('modal-item-amount');
-    const amount = parseFloat(amountInput ? amountInput.value : 0) || 0;
-
+    const amount = parseFloat(document.getElementById('modal-item-amount').value) || 0;
     if (amount <= 0 || !selectedItem) {
         closeModal('modal-item');
         return;
@@ -547,7 +481,7 @@ function confirmAddItem() {
     if (selectedItem.type === 'food') {
         const addedCal = Math.round((selectedItem.cal * amount) / 100);
         userData.consumed += addedCal;
-    } else if (selectedItem.type === 'workout') {
+    } else {
         const burnedCal = Math.round(selectedItem.calPerMin * amount);
         userData.burned += burnedCal;
     }
@@ -557,20 +491,263 @@ function confirmAddItem() {
     closeModal('modal-item');
 }
 
-function updateWater(change) {
+// ==========================================
+// ۹. افزودن خوراکی و ورزش دستی
+// ==========================================
+function openCustomFoodModal() {
+    openModal('modal-custom-food');
+}
+
+function saveCustomFood() {
+    const name = document.getElementById('custom-food-name').value.trim();
+    const cal = parseFloat(document.getElementById('custom-food-cal').value) || 0;
+
+    if (!name || cal <= 0) {
+        alert("لطفاً نام و میزان کالری را به درستی وارد کنید.");
+        return;
+    }
+
+    const newItem = { id: "c_f_" + Date.now(), name: name, cal: cal, unit: "100 گرم" };
+    customFoods.unshift(newItem);
+    localStorage.setItem('fit_custom_foods', JSON.stringify(customFoods));
+
+    renderFoodList(getAllFoods());
+    closeModal('modal-custom-food');
+    document.getElementById('custom-food-name').value = '';
+    document.getElementById('custom-food-cal').value = '';
+}
+
+function openCustomWorkoutModal() {
+    openModal('modal-custom-workout');
+}
+
+function saveCustomWorkout() {
+    const name = document.getElementById('custom-workout-name').value.trim();
+    const cal = parseFloat(document.getElementById('custom-workout-cal').value) || 0;
+
+    if (!name || cal <= 0) {
+        alert("لطفاً نام و میزان کالری‌سوزی را وارد کنید.");
+        return;
+    }
+
+    const newItem = { id: "c_w_" + Date.now(), name: name, calPerMin: cal };
+    customWorkouts.unshift(newItem);
+    localStorage.setItem('fit_custom_workouts', JSON.stringify(customWorkouts));
+
+    renderWorkoutList(getAllWorkouts());
+    closeModal('modal-custom-workout');
+    document.getElementById('custom-workout-name').value = '';
+    document.getElementById('custom-workout-cal').value = '';
+}
+
+// ==========================================
+// ۱۰. کنترل آب و به‌روزرسانی داشبورد
+// ==========================================
+function addWater(change) {
     userData.water = Math.max(0, userData.water + change);
     saveUserData();
     updateDashboard();
 }
 
 function updateDashboard() {
-    const consumedEl = document.getElementById('dashboard-consumed');
-    const burnedEl = document.getElementById('dashboard-burned');
-    const targetEl = document.getElementById('dashboard-target');
-    const waterEl = document.getElementById('dashboard-water');
+    const consumedEl = document.getElementById('consumed-cal');
+    const burnedEl = document.getElementById('burned-cal');
+    const remainingEl = document.getElementById('remaining-cal');
+    const waterEl = document.getElementById('water-count');
 
     if (consumedEl) consumedEl.innerText = userData.consumed;
     if (burnedEl) burnedEl.innerText = userData.burned;
-    if (targetEl) targetEl.innerText = userData.bmr;
-    if (waterEl) waterEl.innerText = userData.water;
+
+    const netCalories = userData.consumed - userData.burned;
+    const remaining = userData.bmr - netCalories;
+
+    if (remainingEl) remainingEl.innerText = remaining;
+    if (waterEl) waterEl.innerText = `${userData.water} از 8 لیوان 💧`;
 }
+
+// ==========================================
+// ۱۱. بخش آمار، BMI و Chart.js
+// ==========================================
+function renderStatsTab() {
+    renderBMI();
+    renderWeightHistoryList();
+    initOrUpdateChart();
+}
+
+function renderBMI() {
+    const container = document.getElementById('bmi-container');
+    if (!container) return;
+
+    const hMeter = userData.height / 100;
+    const bmi = (userData.weight / (hMeter * hMeter)).toFixed(1);
+
+    let status = "";
+    let color = "#10b981";
+
+    if (bmi < 18.5) {
+        status = "کمبود وزن";
+        color = "#3b82f6";
+    } else if (bmi < 25) {
+        status = "وزن ایده‌آل";
+        color = "#10b981";
+    } else if (bmi < 30) {
+        status = "اضافه وزن";
+        color = "#f59e0b";
+    } else {
+        status = "چاقی";
+        color = "#ef4444";
+    }
+
+    container.innerHTML = `
+        <div class="card" style="border-right: 4px solid ${color};">
+            <div class="card-title">شاخص توده بدنی (BMI)</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <span style="font-size:1.5rem; font-weight:bold; color:${color};">${bmi}</span>
+                <span style="background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px; font-size:0.85rem; color:${color}; font-weight:bold;">${status}</span>
+            </div>
+        </div>
+    `;
+}
+
+function submitNewWeight() {
+    const input = document.getElementById('new-weight-input');
+    const newWeight = parseFloat(input.value) || 0;
+
+    if (newWeight <= 0) return;
+
+    userData.weight = newWeight;
+    const today = new Date().toLocaleDateString('fa-IR');
+
+    // افزودن یا به‌روزرسانی تاریخچه
+    const existingIndex = userData.weightHistory.findIndex(h => h.date === today);
+    if (existingIndex > -1) {
+        userData.weightHistory[existingIndex].weight = newWeight;
+    } else {
+        userData.weightHistory.push({ date: today, weight: newWeight });
+    }
+
+    calculateBMR();
+    saveUserData();
+    updateDashboard();
+    renderStatsTab();
+    syncSettingsInputs();
+
+    input.value = '';
+}
+
+function renderWeightHistoryList() {
+    const listEl = document.getElementById('weight-history-list');
+    if (!listEl) return;
+
+    listEl.innerHTML = '';
+    const reversedHistory = [...userData.weightHistory].reverse();
+
+    reversedHistory.forEach(item => {
+        const div = document.createElement('div');
+        div.style.cssText = "display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.85rem;";
+        div.innerHTML = `
+            <span style="color:var(--text-sub);">${item.date}</span>
+            <span style="font-weight:bold; color:var(--accent);">${item.weight} کیلوگرم</span>
+        `;
+        listEl.appendChild(div);
+    });
+}
+
+function setChartFilter(filterType) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`btn-filter-${filterType}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    initOrUpdateChart(filterType);
+}
+
+function initOrUpdateChart(filter = 'weekly') {
+    const canvas = document.getElementById('weightChart');
+    if (!canvas) return;
+
+    let dataPoints = [...userData.weightHistory];
+    if (filter === 'weekly') {
+        dataPoints = dataPoints.slice(-7);
+    } else if (filter === 'monthly') {
+        dataPoints = dataPoints.slice(-30);
+    } else {
+        dataPoints = dataPoints.slice(-365);
+    }
+
+    const labels = dataPoints.map(d => d.date);
+    const data = dataPoints.map(d => d.weight);
+
+    if (weightChartInstance) {
+        weightChartInstance.destroy();
+    }
+
+    weightChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'وزن (کیلوگرم)',
+                data: data,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+                y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } }
+            }
+        }
+    });
+}
+
+// ==========================================
+// ۱۲. بخش تنظیمات
+// ==========================================
+function saveProfileFromSettings() {
+    userData.gender = document.getElementById('user-gender').value;
+    userData.age = parseInt(document.getElementById('user-age').value) || userData.age;
+    userData.height = parseFloat(document.getElementById('user-height').value) || userData.height;
+    userData.weight = parseFloat(document.getElementById('user-weight').value) || userData.weight;
+    userData.activity = parseFloat(document.getElementById('user-activity').value) || userData.activity;
+
+    calculateBMR();
+    saveUserData();
+    updateDashboard();
+    alert("تنظیمات با موفقیت ذخیره شد.");
+}
+
+function syncSettingsInputs() {
+    const g = document.getElementById('user-gender');
+    const a = document.getElementById('user-age');
+    const h = document.getElementById('user-height');
+    const w = document.getElementById('user-weight');
+    const act = document.getElementById('user-activity');
+
+    if (g) g.value = userData.gender;
+    if (a) a.value = userData.age;
+    if (h) h.value = userData.height;
+    if (w) w.value = userData.weight;
+    if (act) act.value = userData.activity;
+}
+
+// ==========================================
+// ۱۳. راه اندازی برنامه
+// ==========================================
+function initApp() {
+    loadUserData();
+    checkDailyReset();
+    renderFoodList(getAllFoods());
+    renderWorkoutList(getAllWorkouts());
+    updateDashboard();
+    syncSettingsInputs();
+    checkOnboarding();
+}
+
+window.addEventListener('DOMContentLoaded', initApp);
