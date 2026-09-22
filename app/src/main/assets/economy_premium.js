@@ -1,10 +1,17 @@
-/* CalorieYar — Free / PRO / Coins Economy Foundation */
+/* CalorieYar — Free / PRO / Coins Economy */
 (function(){
 'use strict';
 if(window.__CY_ECONOMY__)return;
 window.__CY_ECONOMY__=true;
 
-const KEY='calorie_yar_economy_v1';
+const KEY='calorie_yar_economy_v2';
+const PRO_PRICE_TOMAN=200000;
+const COIN_PACKS=[
+  {id:'coins_500',coins:500,price:25000,label:'۵۰۰ سکه'},
+  {id:'coins_1200',coins:1200,price:50000,label:'۱۲۰۰ سکه'},
+  {id:'coins_3000',coins:3000,price:100000,label:'۳۰۰۰ سکه'}
+];
+
 let st={
   tier:'free',
   coins:0,
@@ -12,10 +19,7 @@ let st={
   purchases:[],
   features:{}
 };
-try{
-  st=Object.assign(st,JSON.parse(localStorage.getItem(KEY)||'{}'));
-}catch(e){}
-
+try{st=Object.assign(st,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
 const save=()=>localStorage.setItem(KEY,JSON.stringify(st));
 
 function tx(amount,reason){
@@ -30,8 +34,16 @@ function tx(amount,reason){
   save();
 }
 
+function purchaseRequest(type,id){
+  const event=new CustomEvent('calorieyar-purchase-request',{
+    detail:{type,id,proPriceToman:PRO_PRICE_TOMAN,coinPacks:COIN_PACKS}
+  });
+  window.dispatchEvent(event);
+  alert('درخواست خرید ثبت شد. در مرحله انتشار، این نقطه به درگاه پرداخت معتبر بازار هدف متصل می‌شود.');
+}
+
 window.cyEconomy={
-  get:()=>({...st}),
+  get:()=>({...st,proPriceToman:PRO_PRICE_TOMAN,coinPacks:COIN_PACKS}),
   earn:(x,r)=>tx(Math.max(0,Number(x)||0),r||'reward'),
   spend:(x,r)=>{
     x=Math.max(0,Number(x)||0);
@@ -40,6 +52,8 @@ window.cyEconomy={
     return true;
   },
   isPro:()=>st.tier==='pro',
+  purchasePro:()=>purchaseRequest('pro','pro'),
+  purchaseCoins:(id)=>purchaseRequest('coins',id),
   setPro:(enabled)=>{
     st.tier=enabled?'pro':'free';
     save();
@@ -55,27 +69,27 @@ function open(){
     m.className='modal';
     m.innerHTML=
       '<div class="modal-content" style="max-height:88vh;overflow:auto">'+
-      '<h3>💎 امکانات حرفه‌ای و سکه‌های کالری‌یار</h3>'+
-      '<div class="card">'+
-      '<b>نسخه فعلی: '+(st.tier==='pro'?'PRO 💎':'رایگان 🆓')+'</b>'+
+      '<h3>💎 نسخه رایگان، PRO و سکه‌ها</h3>'+
+      '<div class="card"><b>نسخه فعلی: '+(st.tier==='pro'?'PRO 💎':'رایگان 🆓')+'</b>'+
       '<div style="font-size:1.6rem;color:var(--accent);margin:8px 0">'+st.coins+' 🪙</div>'+
-      '<small style="color:var(--text-sub)">امکانات اصلی رایگان هستند و قابلیت‌های حرفه‌ای می‌توانند در نسخه PRO ارائه شوند.</small>'+
-      '</div>'+
-      '<div class="card">'+
-      '<b>PRO 💎</b>'+
-      '<p style="font-size:.75rem;color:var(--text-sub);margin-top:7px">لایه امکانات حرفه‌ای برای تحلیل‌های عمیق‌تر، گزارش‌های پیشرفته، شخصی‌سازی بیشتر و قابلیت‌های حرفه‌ای آینده. پرداخت و فروش آنلاین فعلاً فعال نیست.</p>'+
-      '</div>'+
-      '<div class="card">'+
-      '<b>سکه‌ها</b>'+
-      '<p style="font-size:.75rem;color:var(--text-sub);margin-top:7px">سکه‌ها فقط از فعالیت‌های داخل برنامه، ماموریت‌ها، استمرار و پاداش‌های رایگان به دست می‌آیند و برای شخصی‌سازی و قابلیت‌های اختیاری مصرف می‌شوند.</p>'+
-      '<div id="cy-econ-log" style="margin-top:8px"></div>'+
-      '</div>'+
-      '<div class="modal-actions">'+
-      '<button class="btn btn-sub" onclick="document.getElementById(\'cy-economy-modal\').style.display=\'none\'">بستن</button>'+
-      '</div>'+
+      '<small style="color:var(--text-sub)">هسته اصلی برنامه رایگان است و خرید امکانات اختیاری است.</small></div>'+
+      '<div class="card"><b>PRO 💎</b>'+
+      '<p style="font-size:.78rem;color:var(--text-sub);margin:7px 0">تحلیل‌های پیشرفته، گزارش‌های عمیق، شخصی‌سازی بیشتر، امکانات حرفه‌ای آینده و حذف تبلیغات.</p>'+
+      '<b>'+PRO_PRICE_TOMAN.toLocaleString('fa-IR')+' تومان</b>'+
+      '<button class="btn" style="width:100%;margin-top:8px" onclick="cyEconomy.purchasePro()">خرید PRO</button></div>'+
+      '<div class="card"><b>🪙 بسته‌های سکه</b><div id="cy-coin-packs" style="margin-top:8px"></div></div>'+
+      '<div class="card"><b>روش‌های دریافت رایگان</b><p style="font-size:.75rem;color:var(--text-sub);margin-top:7px">ماموریت‌ها، استمرار، دستاوردها و در آینده تبلیغ جایزه‌ای می‌توانند سکه ایجاد کنند.</p></div>'+
+      '<div class="card"><b>تاریخچه تراکنش‌ها</b><div id="cy-econ-log" style="margin-top:8px"></div></div>'+
+      '<div class="modal-actions"><button class="btn btn-sub" onclick="document.getElementById(\'cy-economy-modal\').style.display=\'none\'">بستن</button></div>'+
       '</div>';
     document.body.appendChild(m);
   }
+  const packs=document.getElementById('cy-coin-packs');
+  if(packs)packs.innerHTML=COIN_PACKS.map(p=>
+    '<div style="display:flex;gap:7px;align-items:center;margin-bottom:7px">'+
+    '<span style="flex:1;font-size:.8rem">'+p.label+' — '+p.price.toLocaleString('fa-IR')+' تومان</span>'+
+    '<button class="btn" onclick="cyEconomy.purchaseCoins(\''+p.id+'\')">خرید</button></div>'
+  ).join('');
   const log=(st.purchases||[]).slice(-8).reverse().map(x=>
     '<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:.7rem">'+
     (x.type==='earn'?'+':'-')+x.amount+' 🪙 · '+x.reason+'</div>'
@@ -84,7 +98,6 @@ function open(){
   if(logEl)logEl.innerHTML=log||'هنوز تراکنشی ثبت نشده.';
   m.style.display='flex';
 }
-
 window.cyOpenEconomy=open;
 
 function inject(){
@@ -94,12 +107,11 @@ function inject(){
   b.id='cy-economy-card';
   b.className='card';
   b.innerHTML=
-    '<div class="card-title">💎 نسخه رایگان، PRO و سکه‌ها</div>'+
-    '<div style="font-size:.8rem;color:var(--text-sub)">هسته اصلی رایگان؛ امکانات حرفه‌ای و شخصی‌سازی در لایه‌های اختیاری</div>'+
-    '<button class="btn" style="width:100%;margin-top:10px" onclick="cyOpenEconomy()">مشاهده امکانات و سکه‌ها</button>';
+    '<div class="card-title">💎 درآمدزایی اختیاری</div>'+
+    '<div style="font-size:.8rem;color:var(--text-sub)">نسخه رایگان کامل، PRO پولی و سکه‌های اختیاری</div>'+
+    '<button class="btn" style="width:100%;margin-top:10px" onclick="cyOpenEconomy()">مشاهده PRO و سکه‌ها</button>';
   d.appendChild(b);
 }
-
 document.addEventListener('DOMContentLoaded',()=>setTimeout(inject,600));
 if(document.readyState!=='loading')setTimeout(inject,150);
 })();
