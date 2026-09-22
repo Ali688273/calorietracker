@@ -835,3 +835,121 @@ upgradedInitApp=async function(){await profileV4OriginalInit();normalizeProfileV
 checkOnboarding=function(){normalizeProfileV4();const legacy=document.getElementById('modal-onboarding');if(legacy)legacy.style.display='none';renderProfileV4Button();if(!userData.profileCompleted&&!userData.isRegistered)openProfileV4(true);};
 submitOnboarding=function(){saveProfileV4Form();};
 window.removeEventListener('DOMContentLoaded',profileV4OriginalInit);window.removeEventListener('DOMContentLoaded',upgradedInitApp);window.addEventListener('DOMContentLoaded',upgradedInitApp);
+
+
+// ======================================================
+// CALORIE YAR - PACKAGES 4-10 INTEGRATED FOUNDATION
+// BMR/TDEE/Macro + Food/Meals + Dashboard + Weight + Exercise/Water
+// + Coins/Missions + Ads/Premium architecture
+// ======================================================
+const CY410_KEY='calorie_yar_4_10';
+const CY410_DEFAULT={
+  calorieGoal:null, macros:{protein:0,carbs:0,fat:0}, meals:{breakfast:[],lunch:[],dinner:[],snack:[]},
+  weightHistory:[], exerciseHistory:[], waterByDate:{}, favoriteFoods:[], recentFoods:[],
+  coins:0, coinTransactions:[], missions:{}, premium:false, adCooldownUntil:0
+};
+function cy410Load(){try{return {...CY410_DEFAULT,...JSON.parse(localStorage.getItem(CY410_KEY)||'{}')}}catch(e){return {...CY410_DEFAULT}}}
+let cy410=cy410Load();
+function cy410Save(){localStorage.setItem(CY410_KEY,JSON.stringify(cy410))}
+function cy410Today(){return new Date().toISOString().slice(0,10)}
+function cy410Num(v,d=0){const n=Number(v);return Number.isFinite(n)?n:d}
+function cy410BMR(){
+ const w=cy410Num(userData?.weight,70),h=cy410Num(userData?.height,175),a=cy410Num(userData?.age,25);
+ return Math.round(10*w+6.25*h-5*a+(userData?.gender==='female'?-161:5));
+}
+function cy410TDEE(){return Math.round(cy410BMR()*cy410Num(userData?.activity,1.2))}
+function cy410Goal(){
+ const t=cy410TDEE(),g=userData?.goalType||'maintain';
+ return Math.max(1200,Math.round(t+(g==='lose'?-400:g==='gain'?300:0)));
+}
+function cy410Macros(cal){
+ const c=cy410Num(cal,cy410Goal()), p=Math.round(c*.30/4), f=Math.round(c*.25/9), carb=Math.max(0,Math.round((c-p*4-f*9)/4));
+ return {protein:p,carbs:carb,fat:f};
+}
+function cy410EnsureProfileCalc(){
+ const goal=cy410Goal(); cy410.calorieGoal=cy410.calorieGoal||goal;
+ cy410.macros=(cy410.macros?.protein?cy410.macros:cy410Macros(cy410.calorieGoal));
+ userData.dailyCalorieGoal=cy410.calorieGoal; userData.bmr=cy410BMR(); userData.tdee=cy410TDEE();
+ userData.macroGoals=cy410.macros; saveUserData(); cy410Save();
+}
+function cy410Entries(){
+ return Object.values(cy410.meals||{}).flat().filter(x=>x&&typeof x==='object');
+}
+function cy410Totals(){
+ return cy410Entries().reduce((a,x)=>({cal:a.cal+x.cal,protein:a.protein+x.protein,carbs:a.carbs+x.carbs,fat:a.fat+x.fat}),{cal:0,protein:0,carbs:0,fat:0});
+}
+function cy410Water(){
+ const d=cy410.waterByDate?.[cy410Today()]||0; return {glasses:d,ml:d*250,goal:8};
+}
+function cy410Exercise(){
+ return (cy410.exerciseHistory||[]).filter(x=>x.date===cy410Today()).reduce((s,x)=>s+cy410Num(x.cal,0),0);
+}
+function cy410AddCoin(amount,reason){
+ amount=Math.round(amount); if(!amount)return;
+ cy410.coins=Math.max(0,cy410.coins+amount);
+ cy410.coinTransactions.unshift({date:new Date().toISOString(),amount,reason});
+ cy410.coinTransactions=cy410.coinTransactions.slice(0,100); cy410Save(); cy410Render();
+}
+function cy410Mission(id,label,target,reward,progress){
+ const done=Math.min(target,Math.max(0,progress)); const key=cy410Today()+'_'+id;
+ if(!cy410.missions[key])cy410.missions[key]={label,target,reward,progress:done,claimed:false};
+ else cy410.missions[key].progress=Math.max(cy410.missions[key].progress,done);
+ const m=cy410.missions[key];
+ if(m.progress>=m.target&&!m.claimed){m.claimed=true;cy410AddCoin(m.reward,'پاداش مأموریت: '+label)}
+ return m;
+}
+function cy410RecordFood(food,amount,meal){
+ const grams=cy410Num(amount,100), base=cy410Num(food.calories||food.cal||food.kcal,0), factor=grams/100;
+ const item={id:Date.now()+Math.random(),name:food.name||'خوراکی',amount:grams,unit:'گرم',cal:Math.round(base*factor),protein:Math.round(cy410Num(food.protein,0)*factor*10)/10,carbs:Math.round(cy410Num(food.carbs||food.carbohydrates,0)*factor*10)/10,fat:Math.round(cy410Num(food.fat,0)*factor*10)/10,date:cy410Today()};
+ if(!cy410.meals[meal])cy410.meals[meal]=[]; cy410.meals[meal].push(item);
+ cy410.recentFoods=[food.name,...(cy410.recentFoods||[]).filter(n=>n!==food.name)].slice(0,12);
+ cy410Save(); cy410Render(); cy410RefreshLegacyDashboard(); cy410AddCoin(2,'ثبت غذا');
+}
+function cy410AddWaterGlass(n=1){
+ const d=cy410Today();cy410.waterByDate[d]=Math.max(0,Math.min(20,cy410Num(cy410.waterByDate[d])+n));cy410Save();cy410Render();cy410RefreshLegacyDashboard();
+}
+function cy410AddExercise(name,min,cal){
+ cy410.exerciseHistory.push({date:cy410Today(),name,duration:cy410Num(min),cal:Math.round(cy410Num(cal))});
+ cy410Save();cy410Render();cy410RefreshLegacyDashboard();cy410AddCoin(2,'ثبت ورزش');
+}
+function cy410AddWeight(w){
+ w=cy410Num(w);if(w<25||w>350)return;
+ cy410.weightHistory.push({date:cy410Today(),weight:w});userData.weight=w;
+ cy410Save();saveUserData();cy410Render();cy410RefreshLegacyDashboard();cy410AddCoin(3,'ثبت وزن');
+}
+function cy410MealLabel(k){return {breakfast:'صبحانه',lunch:'ناهار',dinner:'شام',snack:'میان‌وعده'}[k]||k}
+function cy410Render(){
+ cy410EnsureProfileCalc();
+ const old=document.getElementById('cy410-panel'); if(old)old.remove();
+ const p=document.createElement('div');p.id='cy410-panel';p.className='card';
+ const t=cy410Totals(),w=cy410Water(),ex=cy410Exercise(),goal=cy410.calorieGoal||cy410Goal();
+ const remaining=Math.max(0,goal-t.cal);
+ const meals=Object.entries(cy410.meals).map(([k,v])=>'<div class="cy410-meal"><b>'+cy410MealLabel(k)+'</b><span>'+v.reduce((s,x)=>s+x.cal,0)+' kcal</span></div>').join('');
+ const missions=[
+   cy410Mission('food','ثبت ۳ خوراکی',3,10,cy410Entries().filter(x=>x.date===cy410Today()).length),
+   cy410Mission('water','نوشیدن ۸ لیوان آب',8,12,w.glasses),
+   cy410Mission('exercise','ثبت یک فعالیت',1,10,ex>0?1:0)
+ ];
+ p.innerHTML='<div class="cy410-head"><b>داشبورد سلامت</b><span>🪙 '+cy410.coins+'</span></div>'+
+ '<div class="cy410-grid"><div><b>'+t.cal+'</b><small>مصرف</small></div><div><b>'+remaining+'</b><small>باقی‌مانده</small></div><div><b>'+goal+'</b><small>هدف</small></div><div><b>'+ex+'</b><small>ورزش kcal</small></div></div>'+
+ '<div class="cy410-macros"><span>پروتئین '+t.protein+'/'+cy410.macros.protein+'g</span><span>کربوهیدرات '+t.carbs+'/'+cy410.macros.carbs+'g</span><span>چربی '+t.fat+'/'+cy410.macros.fat+'g</span></div>'+
+ '<div class="cy410-water"><b>💧 آب امروز: '+w.glasses+' از '+w.goal+' لیوان</b><small>'+w.ml+' میلی‌لیتر</small><div class="cy410-bar"><i style="width:'+Math.min(100,w.glasses/w.goal*100)+'%"></i></div><button onclick="cy410AddWaterGlass(1)">🥤 + یک لیوان</button><button onclick="cy410AddWaterGlass(2)">🥤🥤 + دو لیوان</button><button onclick="cy410AddWaterGlass(-1)">− کم کردن</button></div>'+
+ '<div class="cy410-section"><b>وعده‌های امروز</b>'+meals+'</div>'+
+ '<div class="cy410-section"><b>🎯 مأموریت‌ها</b>'+missions.map(m=>'<div class="cy410-mission">'+(m.claimed?'✅':'⬜')+' '+m.label+' <span>'+Math.min(m.progress,m.target)+'/'+m.target+' · 🪙 '+m.reward+'</span></div>').join('')+'</div>'+
+ '<div class="cy410-section"><b>🔥 محاسبات</b><div class="cy410-line">BMR <span>'+userData.bmr+' kcal</span></div><div class="cy410-line">TDEE <span>'+userData.tdee+' kcal</span></div><div class="cy410-line">هدف روزانه <span>'+goal+' kcal</span></div></div>'+
+ '<div class="cy410-section"><b>📺 پاداش و درآمد</b><p class="cy410-note">Rewarded Ad برای دریافت Coin آماده است؛ اتصال SDK واقعی Tapsell/Adivery در مرحله تبلیغات نهایی انجام می‌شود و پاداش فقط پس از تأیید کامل شدن تبلیغ صادر خواهد شد.</p><button onclick="cy410RewardedAdPlaceholder()">🎁 تماشای تبلیغ برای Coin</button></div>';
+ document.querySelector('.container')?.prepend(p);
+}
+function cy410RewardedAdPlaceholder(){
+ if(cy410.premium)return;
+ alert('زیرساخت تبلیغ جایزه‌ای آماده است. شناسه واقعی Tapsell/Adivery در مرحله تبلیغات وارد می‌شود.');
+}
+function cy410RefreshLegacyDashboard(){try{if(typeof updateDashboard==='function')updateDashboard()}catch(e){}}
+function cy410InjectStyles(){
+ if(document.getElementById('cy410-style'))return;const s=document.createElement('style');s.id='cy410-style';s.textContent='.cy410-head,.cy410-line,.cy410-meal,.cy410-mission{display:flex;justify-content:space-between;gap:8px;align-items:center}.cy410-head{font-size:1.05rem;margin-bottom:12px}.cy410-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.cy410-grid>div{background:rgba(255,255,255,.035);padding:10px 5px;border-radius:10px;text-align:center}.cy410-grid b{display:block;color:var(--accent);font-size:1.05rem}.cy410-grid small,.cy410-note{color:var(--text-sub);font-size:.7rem}.cy410-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:9px 0}.cy410-macros span{font-size:.7rem;text-align:center;padding:7px;border:1px solid var(--border);border-radius:8px}.cy410-water,.cy410-section{margin-top:12px;padding:11px;border:1px solid var(--border);border-radius:12px}.cy410-water small{display:block;color:var(--text-sub);margin-top:3px}.cy410-bar{height:8px;background:var(--border);border-radius:9px;overflow:hidden;margin:8px 0}.cy410-bar i{display:block;height:100%;background:var(--accent)}.cy410-water button,.cy410-section button{border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);padding:8px;border-radius:9px;margin:3px;font-family:inherit}.cy410-meal,.cy410-mission{padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem}.cy410-meal:last-child,.cy410-mission:last-child{border-bottom:0}.cy410-line{padding:6px 0;font-size:.82rem}.cy410-note{line-height:1.8}@media(max-width:420px){.cy410-grid{grid-template-columns:repeat(2,1fr)}}';document.head.appendChild(s)
+}
+const cy410OriginalInit=upgradedInitApp;
+upgradedInitApp=async function(){await cy410OriginalInit();cy410EnsureProfileCalc();cy410InjectStyles();cy410Render()};
+window.removeEventListener('DOMContentLoaded',cy410OriginalInit);
+window.removeEventListener('DOMContentLoaded',upgradedInitApp);
+window.addEventListener('DOMContentLoaded',upgradedInitApp);
