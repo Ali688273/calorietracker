@@ -1,0 +1,29 @@
+/* CalorieYar — Professional Meal Planner Pack */
+(function(){
+'use strict';
+if(window.__CY_MEAL_PLANNER__)return; window.__CY_MEAL_PLANNER__=true;
+const KEY='calorie_yar_meal_plans_v2';
+const getPlans=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}};
+const savePlans=x=>localStorage.setItem(KEY,JSON.stringify(x));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const foods=[
+['صبحانه ایرانی','نان و پنیر و گردو','420','15','48','20'],['صبحانه پروتئینی','تخم مرغ، نان سبوس‌دار و ماست','430','30','38','17'],
+['ناهار ایرانی','جوجه کباب با برنج و سالاد','650','45','72','18'],['ناهار سبک','مرغ گریل با سالاد و ماست','430','48','25','12'],
+['شام ایرانی','خوراک لوبیا با نان سبوس‌دار','480','25','65','12'],['شام سبک','سوپ مرغ و سبزیجات','350','32','35','9'],
+['میان‌وعده','سیب و ماست یونانی','210','15','28','4'],['میان‌وعده پروتئینی','ماست یونانی و مغزها','260','20','15','13'],
+['ورزشی','برنج، مرغ و سبزیجات','620','48','68','14'],['مدیترانه‌ای','ماهی، سیب‌زمینی و سبزیجات','560','42','48','18'],
+['کم‌کربوهیدرات','مرغ، تخم‌مرغ و سالاد','510','52','18','25'],['کتو','گوشت، تخم‌مرغ و آووکادو','650','45','12','45']
+];
+function goal(){try{const p=window.cy410?.profile||{};return Number(p.calorieGoal||window.cy410?.calorieGoal||2000)}catch(e){return 2000}}
+function makeDay(i,type){const g=goal();let set=type==='low'?foods.filter(x=>Number(x[2])<550):type==='high'?foods.filter(x=>Number(x[4])>=40):foods;let b=set[(i*3)%set.length],l=set[(i*3+2)%set.length],d=set[(i*3+4)%set.length],s=set[(i*3+6)%set.length];const arr=[b,l,d,s];let total=arr.reduce((a,x)=>a+Number(x[2]),0);const scale=g/Math.max(total,1);return {breakfast:b,lunch:l,dinner:d,snack:s,total:Math.round(total*scale)}}
+function open(){let m=document.getElementById('cy-plan-modal');if(!m){build();m=document.getElementById('cy-plan-modal')}m.style.display='flex';render()}
+function close(){const m=document.getElementById('cy-plan-modal');if(m)m.style.display='none'}
+function build(){const m=document.createElement('div');m.id='cy-plan-modal';m.className='modal';m.innerHTML='<div class="modal-content" style="max-height:92vh;overflow:auto"><h3>🍽️ برنامه غذایی حرفه‌ای</h3><p style="font-size:.75rem;color:var(--text-sub);margin:6px 0 12px">برنامه متناسب با هدف کالری شما ساخته می‌شود و قابل ویرایش و جایگزینی وعده‌هاست.</p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px"><button class="btn btn-sub" onclick="cyGeneratePlan(7)">۷ روز</button><button class="btn btn-sub" onclick="cyGeneratePlan(14)">۱۴ روز</button><button class="btn btn-sub" onclick="cyGeneratePlan(30)">۳۰ روز</button></div><div style="display:flex;gap:6px;margin-bottom:10px"><select id="cy-plan-style" style="flex:1;padding:10px;border-radius:8px;background:var(--bg-main);color:var(--text-main);border:1px solid var(--border)"><option value="balanced">متعادل</option><option value="low">کالری کنترل‌شده</option><option value="high">پروتئین بالا</option></select><button class="btn" onclick="cyGeneratePlan(7)">ساخت برنامه</button></div><div id="cy-plan-list"></div><div class="modal-actions"><button class="btn btn-sub" onclick="cyCloseMealPlanner()">بستن</button></div></div>';document.body.appendChild(m)}
+function generate(days){const type=document.getElementById('cy-plan-style')?.value||'balanced';const plan={id:Date.now(),createdAt:new Date().toISOString(),days:Array.from({length:days},(_,i)=>({day:i+1,...makeDay(i,type)})),style:type,calorieGoal:goal()};const all=getPlans();all.unshift(plan);savePlans(all.slice(0,20));render(plan)}
+function mealCard(day,key,label){const x=day[key];return '<div style="padding:9px;border:1px solid var(--border);border-radius:10px;margin:5px 0"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+label+'</b><span class="item-value">'+esc(x[2])+' kcal</span></div><div style="font-size:.72rem;color:var(--text-sub)">'+esc(x[0])+' • پروتئین '+esc(x[3])+'g • کربوهیدرات '+esc(x[4])+'g • چربی '+esc(x[5])+'g</div><button class="btn btn-sub" style="margin-top:5px;padding:5px 9px;font-size:.7rem" onclick="cyReplaceMeal('+day.day+',\''+key+'\')">جایگزینی</button></div>'}
+function render(active){const b=document.getElementById('cy-plan-list');if(!b)return;const p=active||getPlans()[0];if(!p){b.innerHTML='<div class="empty-log">هنوز برنامه‌ای ساخته نشده است.</div>';return}b.innerHTML='<div class="card" style="margin:0 0 10px"><b>برنامه '+p.days.length+' روزه</b><div style="font-size:.72rem;color:var(--text-sub);margin-top:4px">هدف روزانه: '+p.calorieGoal+' kcal • نوع: '+(p.style==='high'?'پروتئین بالا':p.style==='low'?'کالری کنترل‌شده':'متعادل')+'</div></div>'+p.days.map(d=>'<div class="card" style="margin-bottom:8px"><b>روز '+d.day+' — حدود '+d.total+' kcal</b>'+mealCard(d,'breakfast','صبحانه')+mealCard(d,'lunch','ناهار')+mealCard(d,'dinner','شام')+mealCard(d,'snack','میان‌وعده')+'</div>').join('')}
+function replace(day,key){const plans=getPlans(),p=plans[0];if(!p)return;const options=foods.filter(x=>x!==p.days[day-1][key]);const x=options[(day+key.length)%options.length];p.days[day-1][key]=x;p.days[day-1].total=p.days[day-1].breakfast[2]*1+p.days[day-1].lunch[2]*1+p.days[day-1].dinner[2]*1+p.days[day-1].snack[2]*1;savePlans(plans);render(p)}
+function inject(){const s=document.getElementById('tab-settings');if(!s||document.getElementById('cy-plan-button'))return;const b=document.createElement('button');b.id='cy-plan-button';b.className='btn';b.style.cssText='width:100%;margin-top:8px';b.textContent='🍽️ برنامه غذایی ۷/۱۴/۳۰ روزه';b.onclick=open;s.querySelector('.card')?.appendChild(b)}
+window.cyOpenMealPlanner=open;window.cyCloseMealPlanner=close;window.cyGeneratePlan=generate;window.cyReplaceMeal=replace;
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',inject);else inject();setTimeout(inject,800);
+})();
