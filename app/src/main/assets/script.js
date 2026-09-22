@@ -975,3 +975,100 @@ function cy410InjectExplanationStyles(){
 }
 const cy410RenderWithExplanations=cy410Render;
 cy410Render=function(){cy410RenderWithExplanations();cy410InjectExplanationStyles();cy410ExplainMetrics()};
+
+/* ======================================================
+   CALORIE YAR - NEXT PACKAGES INTEGRATED FOUNDATION
+   Premium + Reports + Recipes + Meal Plan + Achievements
+   Settings + Notifications + Backup/Restore + i18n
+   Offline-first extension; real ad IDs intentionally deferred
+   ====================================================== */
+const CYNEXT_KEY='calorie_yar_next';
+const CYNEXT_DEFAULT={
+ premium:false, language:'auto', notifications:true, unit:'metric',
+ recipes:[], mealPlans:[], achievements:{}, weeklyGoal:0, customMacroGoals:null
+};
+function cyNextLoad(){try{return Object.assign({},CYNEXT_DEFAULT,JSON.parse(localStorage.getItem(CYNEXT_KEY)||'{}'))}catch(e){return Object.assign({},CYNEXT_DEFAULT)}}
+let cyNext=cyNextLoad();
+function cyNextSave(){localStorage.setItem(CYNEXT_KEY,JSON.stringify(cyNext))}
+function cyNextEntries(){return typeof cy410Entries==='function'?cy410Entries():[]}
+function cyNextDayTotals(date){
+ const xs=cyNextEntries().filter(x=>x.date===date);
+ return xs.reduce((a,x)=>({cal:a.cal+cy410Num(x.cal),protein:a.protein+cy410Num(x.protein),carbs:a.carbs+cy410Num(x.carbs),fat:a.fat+cy410Num(x.fat)}),{cal:0,protein:0,carbs:0,fat:0})
+}
+function cyNextLastDays(n){
+ const out=[];const d=new Date();for(let i=n-1;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);out.push(x.toISOString().slice(0,10))}return out;
+}
+function cyNextReport(){
+ const ds=cyNextLastDays(7), rows=ds.map(d=>Object.assign({date:d},cyNextDayTotals(d)));
+ const avg=Math.round(rows.reduce((s,x)=>s+x.cal,0)/7);
+ const weights=(cy410.weightHistory||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+ const first=weights.length?weights[0].weight:null,last=weights.length?weights[weights.length-1].weight:null;
+ return {rows,avg,weightChange:first!==null&&last!==null?Math.round((last-first)*10)/10:null};
+}
+function cyNextRecipeSave(){
+ const name=prompt('نام دستور غذا'); if(!name)return;
+ const kcal=cy410Num(prompt('کالری هر وعده'),0); const servings=Math.max(1,Math.round(cy410Num(prompt('تعداد وعده'),1)));
+ if(!kcal)return; cyNext.recipes.unshift({id:Date.now(),name,kcal,servings,date:new Date().toISOString()});cyNextSave();cyNextRenderHub();
+}
+function cyNextMealPlanSave(){
+ const name=prompt('نام برنامه/وعده پیشنهادی');if(!name)return;
+ const kcal=Math.max(0,Math.round(cy410Num(prompt('کالری پیشنهادی'),0)));
+ cyNext.mealPlans.unshift({id:Date.now(),name,kcal,date:cy410Today()});cyNextSave();cyNextRenderHub();
+}
+function cyNextSetPremium(){
+ cyNext.premium=true;cy410.premium=true;cyNextSave();cy410Save();cyNextRenderHub();alert('Premium در این نسخه به‌صورت معماری آماده است؛ فعال‌سازی خرید واقعی در مرحله اتصال فروشگاه انجام می‌شود.');
+}
+function cyNextClaimAchievement(id,label,reward){
+ if(cyNext.achievements[id])return;
+ cyNext.achievements[id]={label,date:new Date().toISOString()};
+ cyNextSave();if(typeof cy410AddCoin==='function')cy410AddCoin(reward||5,'دستاورد: '+label);else cyNextRenderHub();
+}
+function cyNextAchievements(){
+ const food=cyNextEntries().length, water=cy410Water().glasses, ex=(cy410.exerciseHistory||[]).length;
+ return [
+  ['food10','ثبت ۱۰ خوراکی',10,food],
+  ['water8','نوشیدن ۸ لیوان آب در یک روز',8,water],
+  ['exercise5','ثبت ۵ فعالیت ورزشی',5,ex]
+ ];
+}
+function cyNextExport(){
+ const payload={version:1,exportedAt:new Date().toISOString(),userData,cy410,cyNext};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='calorieyar-backup-'+cy410Today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function cyNextImport(){
+ const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+ input.onchange=async()=>{try{const file=input.files?.[0];if(!file)return;const data=JSON.parse(await file.text());if(!data||!data.cy410||!data.cyNext)throw new Error('invalid');cy410=Object.assign({},CY410_DEFAULT,data.cy410);cyNext=Object.assign({},CYNEXT_DEFAULT,data.cyNext);if(data.userData){userData=data.userData;saveUserData()}cy410Save();cyNextSave();cyNextRenderHub();if(typeof cy410Render==='function')cy410Render();alert('پشتیبان با موفقیت بازیابی شد.')}catch(e){alert('فایل پشتیبان معتبر نیست.')}};input.click();
+}
+function cyNextSetLanguage(v){
+ cyNext.language=v;cyNextSave();document.documentElement.dir=v==='en'?'ltr':'rtl';document.documentElement.lang=v==='en'?'en':'fa';alert(v==='en'?'English mode is ready. Full UI translation will be expanded in the localization pass.':'حالت فارسی فعال شد.');
+}
+function cyNextNotification(){
+ if(!cyNext.notifications)return;
+ if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
+}
+function cyNextRenderHub(){
+ const panel=document.getElementById('cynext-hub');if(panel)panel.remove();
+ const host=document.getElementById('cy410-panel')||document.querySelector('.container');if(!host)return;
+ const p=document.createElement('div');p.id='cynext-hub';p.className='card cynext-hub';
+ const r=cyNextReport(), ach=cyNextAchievements();
+ ach.forEach(a=>{if(a[3]>=a[2])cyNextClaimAchievement(a[0],a[1],5)});
+ const arows=ach.map(a=>'<div class="cynext-row">'+(cyNext.achievements[a[0]]?'🏆':'⬜')+' '+a[1]+' <span>'+Math.min(a[3],a[2])+'/'+a[2]+'</span></div>').join('');
+ const recipes=cyNext.recipes.slice(0,4).map(x=>'<div class="cynext-row">🍲 '+x.name+' <span>'+x.kcal+' kcal/وعده</span></div>').join('')||'<small>هنوز دستوری ذخیره نشده است.</small>';
+ const plans=cyNext.mealPlans.slice(0,4).map(x=>'<div class="cynext-row">📅 '+x.name+' <span>'+x.kcal+' kcal</span></div>').join('')||'<small>هنوز برنامه‌ای ذخیره نشده است.</small>';
+ p.innerHTML='<div class="cynext-title"><b>🚀 امکانات تکمیلی کالری‌یار</b><span>'+((cyNext.premium||cy410.premium)?'⭐ Premium':'Free')+'</span></div>'+
+ '<section><b>📊 گزارش ۷ روزه</b><div class="cynext-grid"><div><b>'+r.avg+'</b><small>میانگین کالری</small></div><div><b>'+(r.weightChange===null?'—':r.weightChange+' kg')+'</b><small>تغییر وزن</small></div></div><div class="cynext-mini">روزهای گزارش: '+r.rows.length+' · اطلاعات به‌صورت محلی ذخیره می‌شود.</div></section>'+
+ '<section><b>🏆 دستاوردها</b>'+arows+'</section>'+
+ '<section><b>🍲 دستور غذا</b>'+recipes+'<button onclick="cyNextRecipeSave()">+ ساخت دستور</button></section>'+
+ '<section><b>📅 Meal Plan</b>'+plans+'<button onclick="cyNextMealPlanSave()">+ افزودن برنامه</button></section>'+
+ '<section><b>⭐ Premium</b><div class="cynext-mini">حذف تبلیغات، گزارش‌های پیشرفته و امکانات آینده Premium در این معماری پیش‌بینی شده‌اند.</div><button onclick="cyNextSetPremium()">فعال‌سازی آزمایشی معماری Premium</button></section>'+
+ '<section><b>⚙️ تنظیمات و داده‌ها</b><div class="cynext-actions"><button onclick="cyNextSetLanguage('fa')">فارسی</button><button onclick="cyNextSetLanguage('en')">English</button><button onclick="cyNextNotification()">🔔 اعلان‌ها</button><button onclick="cyNextExport()">💾 پشتیبان‌گیری</button><button onclick="cyNextImport()">♻️ بازیابی</button></div></section>'+
+ '<section><b>🔐 حریم خصوصی</b><div class="cynext-mini">داده‌های اصلی فعلاً روی دستگاه نگهداری می‌شوند. هیچ API Key یا شناسه تبلیغاتی در این کد قرار نگرفته است.</div></section>';
+ host.after(p);
+}
+function cyNextInjectStyles(){
+ if(document.getElementById('cynext-style'))return;
+ const s=document.createElement('style');s.id='cynext-style';s.textContent='.cynext-hub{margin-top:12px}.cynext-title,.cynext-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.cynext-title{margin-bottom:10px}.cynext-title span{font-size:.72rem;color:var(--accent)}.cynext-hub section{margin-top:10px;padding:10px;border:1px solid var(--border);border-radius:12px}.cynext-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.cynext-grid>div{padding:9px;text-align:center;border-radius:10px;background:rgba(255,255,255,.035)}.cynext-grid b{display:block;color:var(--accent)}.cynext-grid small,.cynext-mini,.cynext-hub section>small{color:var(--text-sub);font-size:.7rem}.cynext-row{padding:7px 0;border-bottom:1px solid var(--border);font-size:.78rem}.cynext-row:last-child{border-bottom:0}.cynext-hub button{border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);padding:8px;border-radius:9px;margin:4px;font-family:inherit}.cynext-actions{display:flex;flex-wrap:wrap;gap:3px}.cynext-actions button{flex:1;min-width:85px}';document.head.appendChild(s);
+}
+const cyNextOldRender=cy410Render;
+cy410Render=function(){cyNextOldRender();cyNextInjectStyles();cyNextRenderHub()};
