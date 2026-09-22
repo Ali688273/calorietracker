@@ -1144,3 +1144,81 @@ window.cyProSaveGoals=function(){p.targetWeight=n(document.getElementById('cy-pr
 document.addEventListener('DOMContentLoaded',function(){setTimeout(render,250)});
 if(document.readyState!=='loading')setTimeout(render,60);
 })();
+
+/* CALORIE YAR - NEXT FEATURE PACK: smart food, meal plan, recipes, achievements, bilingual shell */
+(function(){
+if(window.__CY_NEXT_PACK)return;window.__CY_NEXT_PACK=true;
+var S='calorie_yar_next_pack';
+var st={recipes:[],mealPlan:[],achievements:{},lang:(localStorage.getItem('cy_lang')||'fa')};
+try{st=Object.assign(st,JSON.parse(localStorage.getItem(S)||'{}'))}catch(e){}
+function save(){localStorage.setItem(S,JSON.stringify(st))}
+function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]})}
+function n(x){return Number.isFinite(Number(x))?Number(x):0}
+function day(){return typeof cy410Today==='function'?cy410Today():new Date().toISOString().slice(0,10)}
+function foods(){return typeof getAllFoods==='function'?getAllFoods():[]}
+function entries(){return typeof cy410Entries==='function'?cy410Entries():[]}
+function ui(){
+if(document.getElementById('cy-next-style'))return;
+var s=document.createElement('style');s.id='cy-next-style';s.textContent='.cy-next{border:1px solid var(--border);background:var(--bg-card);border-radius:16px;padding:13px;margin:10px 0}.cy-next-title{display:flex;justify-content:space-between;align-items:center;font-weight:900;margin-bottom:9px}.cy-next-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.cy-next-btn{border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);border-radius:11px;padding:10px;font:inherit;font-size:.72rem}.cy-next-list{max-height:260px;overflow:auto}.cy-next-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.72rem}.cy-next-row:last-child{border-bottom:0}.cy-next-row small{display:block;color:var(--text-sub);margin-top:2px}.cy-next-badge{display:inline-block;padding:4px 8px;border-radius:20px;background:rgba(16,185,129,.1);color:var(--accent);font-size:.62rem}.cy-next-search{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-main);color:var(--text-main);font:inherit;margin-bottom:8px}.cy-next-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:center;justify-content:center;padding:16px}.cy-next-modal.open{display:flex}.cy-next-modal>div{width:100%;max-width:420px;max-height:85vh;overflow:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:15px}.cy-next-modal input,.cy-next-modal textarea,.cy-next-modal select{width:100%;box-sizing:border-box;padding:10px;margin:5px 0 9px;border:1px solid var(--border);border-radius:9px;background:var(--bg-main);color:var(--text-main);font:inherit}.cy-next-tabs{display:flex;gap:5px;overflow:auto;margin-bottom:9px}.cy-next-tabs button{white-space:nowrap;border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);padding:7px 10px;border-radius:9px;font:inherit;font-size:.68rem}.cy-next-tabs button.active{background:var(--accent);color:#fff}@media(max-width:380px){.cy-next-grid{grid-template-columns:1fr}}';document.head.appendChild(s)
+}
+function modal(id,title,body){
+var m=document.getElementById(id);if(!m){m=document.createElement('div');m.id=id;m.className='cy-next-modal';m.innerHTML='<div><div class="cy-next-title"><span>'+title+'</span><button onclick="document.getElementById(\''+id+'\').classList.remove(\'open\')" style="border:0;background:transparent;color:var(--text-sub);font-size:1.2rem">×</button></div>'+body+'</div>';m.onclick=function(e){if(e.target===m)m.classList.remove('open')};document.body.appendChild(m)}return m
+}
+function foodPicker(){
+var body='<input id="cy-food-q" class="cy-next-search" placeholder="جستجوی غذا..." oninput="cyNextFoodSearch()"><div id="cy-food-results" class="cy-next-list"></div>';
+var m=modal('cy-food-modal','🥗 ثبت سریع غذا',body);m.classList.add('open');cyNextFoodSearch()
+}
+window.cyNextFoodSearch=function(){
+var q=(document.getElementById('cy-food-q')||{}).value||'',arr=foods().filter(function(f){return !q||String(f.name||'').toLowerCase().includes(q.toLowerCase())}).slice(0,40);
+var h=arr.map(function(f){var id=String(f.id||f.name).replace(/'/g,"\\'");return '<div class="cy-next-row"><span><b>'+esc(f.name)+'</b><small>'+Math.round(n(f.calories||f.cal))+' kcal / 100g</small></span><button class="cy-next-btn" onclick="cyNextLogFood(\''+id+'\')">ثبت</button></div>'}).join('');
+document.getElementById('cy-food-results').innerHTML=h||'<div style="color:var(--text-sub);padding:10px">غذایی پیدا نشد.</div>'
+};
+window.cyNextLogFood=function(id){
+var f=foods().find(function(x){return String(x.id||x.name)===String(id)});if(!f)return;
+var g=n(prompt('مقدار به گرم',100));if(g<=0)return;
+var cal=n(f.calories||f.cal)*g/100,pro=n(f.protein)*g/100,carb=n(f.carbs||f.carbohydrates)*g/100,fat=n(f.fat||f.fats)*g/100;
+if(typeof cy410AddFood==='function')cy410AddFood(f.name,g,cal,pro,carb,fat,'snack');
+else{cy410.entries=cy410.entries||[];cy410.entries.push({date:day(),name:f.name,grams:g,cal:cal,protein:pro,carbs:carb,fat:fat,meal:'snack'});cy410Save&&cy410Save()}
+document.getElementById('cy-food-modal').classList.remove('open');if(typeof cy410Render==='function')cy410Render()
+};
+function recipes(){
+var rows=st.recipes.map(function(r,i){return '<div class="cy-next-row"><span><b>🍲 '+esc(r.name)+'</b><small>'+Math.round(r.kcal)+' kcal · '+r.servings+' پرس</small></span><button class="cy-next-btn" onclick="cyNextUseRecipe('+i+')">ثبت</button></div>'}).join('');
+var body='<button class="cy-next-btn" style="width:100%;margin-bottom:8px" onclick="cyNextNewRecipe()">＋ دستور غذای جدید</button><div class="cy-next-list">'+(rows||'<div style="color:var(--text-sub);padding:8px">هنوز دستوری ذخیره نشده.</div>')+'</div>';
+modal('cy-recipe-modal','🍲 دستورهای غذایی',body).classList.add('open')
+}
+window.cyNextNewRecipe=function(){
+var name=prompt('نام غذا');if(!name)return;var kcal=n(prompt('کالری هر پرس'));var servings=Math.max(1,Math.round(n(prompt('تعداد پرس'))));if(!kcal)return;
+st.recipes.push({name:name,kcal:kcal,servings:servings});save();document.getElementById('cy-recipe-modal').classList.remove('open');recipes()
+};
+window.cyNextUseRecipe=function(i){var r=st.recipes[i];if(!r)return;if(typeof cy410AddFood==='function')cy410AddFood(r.name,1,r.kcal,0,0,0,'snack');if(typeof cy410Render==='function')cy410Render();document.getElementById('cy-recipe-modal').classList.remove('open')};
+function plan(){
+var rows=st.mealPlan.map(function(r,i){return '<div class="cy-next-row"><span><b>'+esc(r.name)+'</b><small>'+r.meal+' · '+Math.round(r.kcal)+' kcal</small></span><button class="cy-next-btn" onclick="cyNextDeletePlan('+i+')">حذف</button></div>'}).join('');
+var body='<button class="cy-next-btn" style="width:100%;margin-bottom:8px" onclick="cyNextAddPlan()">＋ افزودن برنامه</button><div class="cy-next-list">'+(rows||'<div style="color:var(--text-sub);padding:8px">برنامه‌ای ثبت نشده.</div>')+'</div>';
+modal('cy-plan-modal','📅 برنامه غذایی',body).classList.add('open')
+}
+window.cyNextAddPlan=function(){var name=prompt('نام وعده/غذا');if(!name)return;var meal=prompt('وعده: صبحانه، ناهار، شام یا میان‌وعده','صبحانه')||'میان‌وعده';var kcal=n(prompt('کالری'));if(!kcal)return;st.mealPlan.push({name:name,meal:meal,kcal:kcal});save();document.getElementById('cy-plan-modal').classList.remove('open');plan()};
+window.cyNextDeletePlan=function(i){st.mealPlan.splice(i,1);save();plan()};
+function achievements(){
+var foodCount=entries().length,water=(typeof cy410Water==='function'?cy410Water():{glasses:0}).glasses||0,ex=(cy410.exerciseHistory||[]).length;
+var a=[['firstFood','🥗 اولین ثبت غذا',foodCount>=1,5],['tenFoods','🍽️ ده ثبت غذا',foodCount>=10,15],['water8','💧 هشت لیوان آب',water>=8,10],['exercise5','🏃 پنج تمرین',ex>=5,15],['weight','⚖️ ثبت وزن',((cy410.weightHistory||[]).length)>=1,5]];
+var body=a.map(function(x){var got=!!st.achievements[x[0]];if(x[2]&&!got){st.achievements[x[0]]=day();if(typeof cy410AddCoins==='function')cy410AddCoins(x[3],'achievement')}return '<div class="cy-next-row"><span>'+x[1]+'<small>'+ (x[2]?'کامل شده':'در انتظار')+' · جایزه '+x[3]+' سکه</small></span><span class="cy-next-badge">'+(x[2]?'✓':'🔒')+'</span></div>'}).join('');
+save();modal('cy-ach-modal','🏆 دستاوردها',body).classList.add('open')
+}
+function injectHub(){
+var d=document.getElementById('tab-settings');if(!d||document.getElementById('cy-next-hub'))return;
+var box=document.createElement('div');box.id='cy-next-hub';box.className='cy-next';
+box.innerHTML='<div class="cy-next-title"><span>✨ امکانات کالری‌یار</span><span class="cy-next-badge">نسخه پیشرفته</span></div><div class="cy-next-grid"><button class="cy-next-btn" onclick="cyNextFoodPicker()">🥗 ثبت سریع غذا</button><button class="cy-next-btn" onclick="cyNextRecipes()">🍲 دستورها</button><button class="cy-next-btn" onclick="cyNextPlan()">📅 برنامه غذایی</button><button class="cy-next-btn" onclick="cyNextAchievements()">🏆 دستاوردها</button></div>';
+d.prepend(box)
+}
+window.cyNextFoodPicker=foodPicker;window.cyNextRecipes=recipes;window.cyNextPlan=plan;window.cyNextAchievements=achievements;
+function language(){
+var current=st.lang==='en';
+document.documentElement.lang=current?'en':'fa';document.documentElement.dir=current?'ltr':'rtl';
+document.body.classList.toggle('cy-en',current);
+localStorage.setItem('cy_lang',st.lang)
+}
+window.cyNextSetLanguage=function(l){st.lang=l;save();language();location.reload()};
+ui();language();
+document.addEventListener('DOMContentLoaded',function(){setTimeout(injectHub,350)});
+if(document.readyState!=='loading')setTimeout(injectHub,80);
+})();
