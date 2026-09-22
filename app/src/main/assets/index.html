@@ -4,555 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>کالری‌شمار هوشمند</title>
-    <!-- کتابخانه الرسم نمودار Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --accent: #10b981;
-            --accent-burn: #ef4444;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --border: #334155;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            padding-bottom: 80px;
-        }
-
-        .header {
-            background-color: var(--bg-card);
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-title h1 {
-            font-size: 1.1rem;
-        }
-
-        .header-title p {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-        }
-
-        .container {
-            padding: 16px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .card-title {
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: var(--text-sub);
-            text-align: center;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            text-align: center;
-        }
-
-        .stat-box {
-            background-color: rgba(255, 255, 255, 0.03);
-            padding: 12px 4px;
-            border-radius: 8px;
-        }
-
-        .stat-val {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .stat-val.burn {
-            color: var(--accent-burn);
-        }
-
-        .stat-lbl {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            margin-top: 4px;
-        }
-
-        .water-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-burn {
-            background-color: var(--accent-burn);
-        }
-
-        .btn-sub {
-            background-color: var(--border);
-            color: var(--text-main);
-        }
-
-        .filter-btn-group {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 12px;
-        }
-
-        .filter-btn {
-            background-color: var(--bg-main);
-            color: var(--text-sub);
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
-        .filter-btn.active {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background-color: var(--bg-card);
-            color: var(--text-main);
-            margin-bottom: 12px;
-            outline: none;
-            font-size: 0.95rem;
-        }
-
-        .item-card {
-            background-color: var(--bg-card);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border);
-            cursor: pointer;
-        }
-
-        .item-info .name {
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-
-        .item-info .details {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            margin-top: 2px;
-        }
-
-        .item-value {
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .item-value.burn {
-            color: var(--accent-burn);
-        }
-
-        .navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--bg-card);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            border-top: 1px solid var(--border);
-            z-index: 100;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-sub);
-            font-size: 0.7rem;
-            cursor: pointer;
-            text-decoration: none;
-            width: 20%;
-        }
-
-        .nav-item.active {
-            color: var(--accent);
-        }
-
-        .nav-icon {
-            font-size: 1.2rem;
-            margin-bottom: 2px;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 200;
-        }
-
-        .modal-content {
-            background-color: var(--bg-card);
-            padding: 20px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid var(--border);
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            margin-bottom: 4px;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            outline: none;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .modal-actions .btn {
-            flex: 1;
-        }
+        :root { --bg-main:#0f172a; --bg-card:#1e293b; --accent:#10b981; --accent-burn:#ef4444; --text-main:#f8fafc; --text-sub:#94a3b8; --border:#334155; }
+        *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+        body{background:var(--bg-main);color:var(--text-main);padding-bottom:80px}
+        .header{background:var(--bg-card);padding:16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+        .header-title h1{font-size:1.1rem}.header-title p{font-size:.75rem;color:var(--text-sub)}
+        .container{padding:16px}.tab-content{display:none}.tab-content.active{display:block}
+        .card{background:var(--bg-card);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid var(--border)}
+        .card-title{font-size:1rem;margin-bottom:12px;color:var(--text-sub);text-align:center}
+        .dashboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+        .stat-box{background:rgba(255,255,255,.03);padding:12px 4px;border-radius:8px}.stat-val{font-size:1.2rem;font-weight:bold;color:var(--accent)}.stat-val.burn{color:var(--accent-burn)}
+        .stat-lbl{font-size:.75rem;color:var(--text-sub);margin-top:4px}.water-controls{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+        .btn{background:var(--accent);color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;cursor:pointer}.btn-burn{background:var(--accent-burn)}.btn-sub{background:var(--border);color:var(--text-main)}
+        .filter-btn-group{display:flex;gap:8px;justify-content:center;margin-bottom:12px}.filter-btn{background:var(--bg-main);color:var(--text-sub);border:1px solid var(--border);padding:6px 14px;border-radius:6px;font-size:.8rem;cursor:pointer}.filter-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+        .search-box{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-main);margin-bottom:12px;outline:none;font-size:.95rem}
+        .item-card{background:var(--bg-card);padding:12px 16px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);cursor:pointer}
+        .item-info .name{font-weight:bold;font-size:.95rem}.item-info .details{font-size:.75rem;color:var(--text-sub);margin-top:2px}.item-value{font-weight:bold;color:var(--accent)}.item-value.burn{color:var(--accent-burn)}
+        .navbar{position:fixed;bottom:0;left:0;right:0;background:var(--bg-card);display:flex;justify-content:space-around;padding:8px 0;border-top:1px solid var(--border);z-index:100}
+        .nav-item{display:flex;flex-direction:column;align-items:center;color:var(--text-sub);font-size:.7rem;cursor:pointer;text-decoration:none;width:20%}.nav-item.active{color:var(--accent)}.nav-icon{font-size:1.2rem;margin-bottom:2px}
+        .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}.modal-content{background:var(--bg-card);padding:20px;border-radius:12px;width:100%;max-width:400px;border:1px solid var(--border)}
+        .form-group{margin-bottom:12px}.form-group label{display:block;font-size:.8rem;color:var(--text-sub);margin-bottom:4px}.form-group input,.form-group select{width:100%;padding:10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);outline:none}.modal-actions{display:flex;gap:8px;margin-top:16px}.modal-actions .btn{flex:1}
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <svg width="40" height="40" viewBox="0 0 108 108">
-            <path fill="#10B981" d="M54,34 C41,34 31,43 31,57 C31,73 45,84 54,84 C63,84 77,73 77,57 C77,43 67,34 54,34 Z" />
-            <path fill="#059669" d="M54,34 C50,38 58,38 54,34 Z" />
-            <path fill="#78350F" d="M53,26 C53,26 55,30 54,34 C53,34 51,30 53,26 Z" />
-            <path fill="#34D399" d="M54,28 C60,20 70,22 71,26 C64,29 58,29 54,28 Z" />
-        </svg>
-        <div class="header-title">
-            <h1>کالری‌شمار هوشمند</h1>
-            <p>امروز</p>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- داشبورد -->
-        <div id="tab-dashboard" class="tab-content active">
-            <div class="card">
-                <div class="card-title">خلاصه انرژی امروز</div>
-                <div class="dashboard-grid">
-                    <div class="stat-box">
-                        <div id="consumed-cal" class="stat-val">0</div>
-                        <div class="stat-lbl">دریافتی</div>
-                    </div>
-                    <div class="stat-box">
-                        <div id="remaining-cal" class="stat-val">2000</div>
-                        <div class="stat-lbl">باقیمانده</div>
-                    </div>
-                    <div class="stat-box">
-                        <div id="burned-cal" class="stat-val burn">0</div>
-                        <div class="stat-lbl">سوخته شده</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">مصرف آب امروز</div>
-                <div class="water-controls">
-                    <span id="water-count" style="font-weight: bold;">0 از 8 لیوان 💧</span>
-                    <div>
-                        <button class="btn btn-sub" onclick="addWater(-1)">- کاهش</button>
-                        <button class="btn" onclick="addWater(1)">+ افزودن</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- خوراکی‌ها -->
-        <div id="tab-foods" class="tab-content">
-            <input type="text" id="food-search" class="search-box" placeholder="جستجو (مثلاً: نان، سیب، جوجه)..." oninput="handleFoodSearch()">
-            <button class="btn btn-sub" style="width: 100%; margin-bottom: 12px;" onclick="openCustomFoodModal()">+ افزودن خوراکی دستی (اگر در لیست نبود)</button>
-            <div id="food-list"></div>
-        </div>
-
-        <!-- کالری‌سوزی -->
-        <div id="tab-workouts" class="tab-content">
-            <input type="text" id="workout-search" class="search-box" placeholder="جستجوی فعالیت یا ورزش..." oninput="handleWorkoutSearch()">
-            <button class="btn btn-sub" style="width: 100%; margin-bottom: 12px;" onclick="openCustomWorkoutModal()">+ افزودن فعالیت دستی (اگر در لیست نبود)</button>
-            <div id="workout-list"></div>
-        </div>
-
-        <!-- آمار و وزن (شامل BMI و نمودار) -->
-        <div id="tab-stats" class="tab-content">
-            <!-- کارت BMI خودکار -->
-            <div id="bmi-container"></div>
-
-            <!-- نمودار تغییرات وزن -->
-            <div class="card">
-                <div class="card-title">نمودار تغییرات وزن</div>
-                <div class="filter-btn-group">
-                    <button id="btn-filter-weekly" class="filter-btn active" onclick="setChartFilter('weekly')">هفتگی</button>
-                    <button id="btn-filter-monthly" class="filter-btn" onclick="setChartFilter('monthly')">ماهانه</button>
-                    <button id="btn-filter-yearly" class="filter-btn" onclick="setChartFilter('yearly')">سالانه</button>
-                </div>
-                <div style="position: relative; width:100%; height:200px;">
-                    <canvas id="weightChart"></canvas>
-                </div>
-            </div>
-
-            <!-- ثبت وزن جدید -->
-            <div class="card">
-                <div class="card-title">ثبت وزن جدید</div>
-                <div class="form-group">
-                    <input type="number" id="new-weight-input" placeholder="وزن امروز (کیلوگرم)">
-                </div>
-                <button class="btn" style="width: 100%;" onclick="submitNewWeight()">ثبت وزن</button>
-            </div>
-
-            <!-- تاریخچه ثبت وزن -->
-            <div class="card">
-                <div class="card-title">تاریخچه وزن</div>
-                <div id="weight-history-list"></div>
-            </div>
-        </div>
-
-        <!-- تنظیمات -->
-        <div id="tab-settings" class="tab-content">
-            <div class="card">
-                <div class="card-title">تنظیمات پروفایل</div>
-                <div class="form-group">
-                    <label>جنسیت</label>
-                    <select id="user-gender">
-                        <option value="male">مرد</option>
-                        <option value="female">زن</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>سن (سال)</label>
-                    <input type="number" id="user-age" value="25">
-                </div>
-                <div class="form-group">
-                    <label>قد (سانتی‌متر)</label>
-                    <input type="number" id="user-height" value="175">
-                </div>
-                <div class="form-group">
-                    <label>وزن (کیلوگرم)</label>
-                    <input type="number" id="user-weight" value="70">
-                </div>
-                <div class="form-group">
-                    <label>سطح فعالیت</label>
-                    <select id="user-activity">
-                        <option value="1.2">کم (نشسته)</option>
-                        <option value="1.375">متوسط (۱-۳ روز ورزش در هفته)</option>
-                        <option value="1.55">زیاد (۳-۵ روز ورزش در هفته)</option>
-                        <option value="1.725">خیلی زیاد (۶-۷ روز ورزش)</option>
-                    </select>
-                </div>
-                <button class="btn" style="width: 100%; margin-top: 8px;" onclick="saveProfileFromSettings()">ذخیره تغییرات</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- نوار پایین -->
-    <div class="navbar">
-        <div class="nav-item active" onclick="switchTab('dashboard', this)">
-            <span class="nav-icon">📊</span>
-            <span>داشبورد</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('foods', this)">
-            <span class="nav-icon">🥗</span>
-            <span>خوراکی‌ها</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('workouts', this)">
-            <span class="nav-icon">🔥</span>
-            <span>کالری‌سوزی</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('stats', this)">
-            <span class="nav-icon">📈</span>
-            <span>آمار</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('settings', this)">
-            <span class="nav-icon">⚙️</span>
-            <span>تنظیمات</span>
-        </div>
-    </div>
-
-    <!-- مودال ثبت مقدار -->
-    <div id="modal-item" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-item-title" style="margin-bottom: 12px; font-size: 1rem;">ثبت آیتم</h3>
-            <div class="form-group">
-                <label id="modal-item-unit-label">مقدار (گرم)</label>
-                <input type="number" id="modal-item-amount" value="100">
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-sub" onclick="closeModal('modal-item')">انصراف</button>
-                <button class="btn" onclick="confirmAddItem()">ثبت در امروز</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال افزودن دستی خوراکی -->
-    <div id="modal-custom-food" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 12px; font-size: 1rem;">افزودن خوراکی جدید</h3>
-            <div class="form-group">
-                <label>نام خوراکی</label>
-                <input type="text" id="custom-food-name" placeholder="مثلاً: کیک خانگی">
-            </div>
-            <div class="form-group">
-                <label>کالری در ۱۰۰ گرم</label>
-                <input type="number" id="custom-food-cal" placeholder="مثلاً: 250">
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-sub" onclick="closeModal('modal-custom-food')">انصراف</button>
-                <button class="btn" onclick="saveCustomFood()">افزودن به لیست</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال افزودن دستی ورزش -->
-    <div id="modal-custom-workout" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 12px; font-size: 1rem;">افزودن فعالیت ورزشی جدید</h3>
-            <div class="form-group">
-                <label>نام فعالیت</label>
-                <input type="text" id="custom-workout-name" placeholder="مثلاً: کاراته">
-            </div>
-            <div class="form-group">
-                <label>کالری‌سوزی در دقیقه</label>
-                <input type="number" id="custom-workout-cal" placeholder="مثلاً: 8">
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-sub" onclick="closeModal('modal-custom-workout')">انصراف</button>
-                <button class="btn" onclick="saveCustomWorkout()">افزودن به لیست</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال خوش‌آمدگویی اولیه -->
-    <div id="modal-onboarding" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 8px;">به کالری‌شمار خوش آمدید</h3>
-            <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 16px;">برای محاسبه میزان کالری مورد نیاز، مشخصات خود را وارد کنید:</p>
-            <div class="form-group">
-                <label>جنسیت</label>
-                <select id="init-gender">
-                    <option value="male">مرد</option>
-                    <option value="female">زن</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>سن</label>
-                <input type="number" id="init-age" value="25">
-            </div>
-            <div class="form-group">
-                <label>قد (سانتی‌متر)</label>
-                <input type="number" id="init-height" value="175">
-            </div>
-            <div class="form-group">
-                <label>وزن (کیلوگرم)</label>
-                <input type="number" id="init-weight" value="70">
-            </div>
-            <div class="form-group">
-                <label>سطح فعالیت روزانه</label>
-                <select id="init-activity">
-                    <option value="1.2">کم (کارمندی / کم‌تحرک)</option>
-                    <option value="1.375">متوسط (ورزش سبك ۱ تا ۳ روز)</option>
-                    <option value="1.55">زیاد (ورزش متوسط ۳ تا ۵ روز)</option>
-                    <option value="1.725">ورزشکار (۶ تا ۷ روز ورزش)</option>
-                </select>
-            </div>
-            <button class="btn" style="width: 100%; margin-top: 10px;" onclick="submitOnboarding()">شروع و محاسبه BMR</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-    <script src="rewards_reminders.js"></script>
-    <script src="food_discovery.js"></script>
-    <script src="performance_history.js"></script>
-    <script src="ecosystem_plus.js"></script>
-    <script src="i18n.js"></script>
+<div class="header"><svg width="40" height="40" viewBox="0 0 108 108"><path fill="#10B981" d="M54,34 C41,34 31,43 31,57 C31,73 45,84 54,84 C63,84 77,73 77,57 C77,43 67,34 54,34 Z"/><path fill="#059669" d="M54,34 C50,38 58,38 54,34 Z"/><path fill="#78350F" d="M53,26 C53,26 55,30 54,34 C53,34 51,30 53,26 Z"/><path fill="#34D399" d="M54,28 C60,20 70,22 71,26 C64,29 58,29 54,28 Z"/></svg><div class="header-title"><h1>کالری‌شمار هوشمند</h1><p>امروز</p></div></div>
+<div class="container">
+<div id="tab-dashboard" class="tab-content active">
+<div class="card"><div class="card-title">خلاصه انرژی امروز</div><div class="dashboard-grid"><div class="stat-box"><div id="consumed-cal" class="stat-val">0</div><div class="stat-lbl">دریافتی</div></div><div class="stat-box"><div id="remaining-cal" class="stat-val">2000</div><div class="stat-lbl">باقیمانده</div></div><div class="stat-box"><div id="burned-cal" class="stat-val burn">0</div><div class="stat-lbl">سوخته شده</div></div></div></div>
+<div class="card"><div class="card-title">مصرف آب امروز</div><div class="water-controls"><span id="water-count" style="font-weight:bold">0 از 8 لیوان 💧</span><div><button class="btn btn-sub" onclick="addWater(-1)">- کاهش</button><button class="btn" onclick="addWater(1)">+ افزودن</button></div></div></div>
+</div>
+<div id="tab-foods" class="tab-content"><input type="text" id="food-search" class="search-box" placeholder="جستجو (مثلاً: نان، سیب، جوجه)..." oninput="handleFoodSearch()"><button class="btn btn-sub" style="width:100%;margin-bottom:12px" onclick="openCustomFoodModal()">+ افزودن خوراکی دستی (اگر در لیست نبود)</button><div id="food-list"></div></div>
+<div id="tab-workouts" class="tab-content"><input type="text" id="workout-search" class="search-box" placeholder="جستجوی فعالیت یا ورزش..." oninput="handleWorkoutSearch()"><button class="btn btn-sub" style="width:100%;margin-bottom:12px" onclick="openCustomWorkoutModal()">+ افزودن فعالیت دستی (اگر در لیست نبود)</button><div id="workout-list"></div></div>
+<div id="tab-stats" class="tab-content"><div id="bmi-container"></div><div class="card"><div class="card-title">نمودار تغییرات وزن</div><div class="filter-btn-group"><button id="btn-filter-weekly" class="filter-btn active" onclick="setChartFilter('weekly')">هفتگی</button><button id="btn-filter-monthly" class="filter-btn" onclick="setChartFilter('monthly')">ماهانه</button><button id="btn-filter-yearly" class="filter-btn" onclick="setChartFilter('yearly')">سالانه</button></div><div style="position:relative;width:100%;height:200px"><canvas id="weightChart"></canvas></div></div><div class="card"><div class="card-title">ثبت وزن جدید</div><div class="form-group"><input type="number" id="new-weight-input" placeholder="وزن امروز (کیلوگرم)"></div><button class="btn" style="width:100%" onclick="submitNewWeight()">ثبت وزن</button></div><div class="card"><div class="card-title">تاریخچه وزن</div><div id="weight-history-list"></div></div></div>
+<div id="tab-settings" class="tab-content"><div class="card"><div class="card-title">تنظیمات پروفایل</div><div class="form-group"><label>جنسیت</label><select id="user-gender"><option value="male">مرد</option><option value="female">زن</option></select></div><div class="form-group"><label>سن (سال)</label><input type="number" id="user-age" value="25"></div><div class="form-group"><label>قد (سانتی‌متر)</label><input type="number" id="user-height" value="175"></div><div class="form-group"><label>وزن (کیلوگرم)</label><input type="number" id="user-weight" value="70"></div><div class="form-group"><label>سطح فعالیت</label><select id="user-activity"><option value="1.2">کم (نشسته)</option><option value="1.375">متوسط (۱-۳ روز ورزش در هفته)</option><option value="1.55">زیاد (۳-۵ روز ورزش در هفته)</option><option value="1.725">خیلی زیاد (۶-۷ روز ورزش)</option></select></div><button class="btn" style="width:100%;margin-top:8px" onclick="saveProfileFromSettings()">ذخیره تغییرات</button></div></div>
+</div>
+<div class="navbar"><div class="nav-item active" onclick="switchTab('dashboard',this)"><span class="nav-icon">📊</span><span>داشبورد</span></div><div class="nav-item" onclick="switchTab('foods',this)"><span class="nav-icon">🥗</span><span>خوراکی‌ها</span></div><div class="nav-item" onclick="switchTab('workouts',this)"><span class="nav-icon">🔥</span><span>کالری‌سوزی</span></div><div class="nav-item" onclick="switchTab('stats',this)"><span class="nav-icon">📈</span><span>آمار</span></div><div class="nav-item" onclick="switchTab('settings',this)"><span class="nav-icon">⚙️</span><span>تنظیمات</span></div></div>
+<div id="modal-item" class="modal"><div class="modal-content"><h3 id="modal-item-title" style="margin-bottom:12px;font-size:1rem">ثبت آیتم</h3><div class="form-group"><label id="modal-item-unit-label">مقدار (گرم)</label><input type="number" id="modal-item-amount" value="100"></div><div class="modal-actions"><button class="btn btn-sub" onclick="closeModal('modal-item')">انصراف</button><button class="btn" onclick="confirmAddItem()">ثبت در امروز</button></div></div></div>
+<div id="modal-custom-food" class="modal"><div class="modal-content"><h3 style="margin-bottom:12px;font-size:1rem">افزودن خوراکی جدید</h3><div class="form-group"><label>نام خوراکی</label><input type="text" id="custom-food-name" placeholder="مثلاً: کیک خانگی"></div><div class="form-group"><label>کالری در ۱۰۰ گرم</label><input type="number" id="custom-food-cal" placeholder="مثلاً: 250"></div><div class="modal-actions"><button class="btn btn-sub" onclick="closeModal('modal-custom-food')">انصراف</button><button class="btn" onclick="saveCustomFood()">افزودن به لیست</button></div></div></div>
+<div id="modal-custom-workout" class="modal"><div class="modal-content"><h3 style="margin-bottom:12px;font-size:1rem">افزودن فعالیت ورزشی جدید</h3><div class="form-group"><label>نام فعالیت</label><input type="text" id="custom-workout-name" placeholder="مثلاً: کاراته"></div><div class="form-group"><label>کالری‌سوزی در دقیقه</label><input type="number" id="custom-workout-cal" placeholder="مثلاً: 8"></div><div class="modal-actions"><button class="btn btn-sub" onclick="closeModal('modal-custom-workout')">انصراف</button><button class="btn" onclick="saveCustomWorkout()">انصراف</button></div></div></div>
+<div id="modal-onboarding" class="modal"><div class="modal-content"><h3 style="margin-bottom:8px">به کالری‌شمار خوش آمدید</h3><p style="font-size:.8rem;color:var(--text-sub);margin-bottom:16px">برای محاسبه میزان کالری مورد نیاز، مشخصات خود را وارد کنید:</p><div class="form-group"><label>جنسیت</label><select id="init-gender"><option value="male">مرد</option><option value="female">زن</option></select></div><div class="form-group"><label>سن</label><input type="number" id="init-age" value="25"></div><div class="form-group"><label>قد (سانتی‌متر)</label><input type="number" id="init-height" value="175"></div><div class="form-group"><label>وزن (کیلوگرم)</label><input type="number" id="init-weight" value="70"></div><div class="form-group"><label>سطح فعالیت روزانه</label><select id="init-activity"><option value="1.2">کم (کارمندی / کم‌تحرک)</option><option value="1.375">متوسط (ورزش سبک ۱ تا ۳ روز)</option><option value="1.55">زیاد (ورزش متوسط ۳ تا ۵ روز)</option><option value="1.725">ورزشکار (۶ تا ۷ روز ورزش)</option></select></div><button class="btn" style="width:100%;margin-top:10px" onclick="submitOnboarding()">شروع و محاسبه BMR</button></div></div>
+<script src="script.js"></script>
+<script src="rewards_reminders.js"></script>
+<script src="food_discovery.js"></script>
+<script src="performance_history.js"></script>
+<script src="ecosystem_plus.js"></script>
+<script src="i18n.js"></script>
+<script src="nutrition_intelligence.js"></script>
 </body>
 </html>
-
 <style>
 .theme-toggle{margin-right:auto;width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--bg-main);color:var(--text-main);font-size:18px;cursor:pointer}
 .daily-log-card{overflow:hidden}.log-row{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid var(--border);gap:10px}.log-row:last-child{border-bottom:0}.log-row small{display:block;color:var(--text-sub);font-size:.72rem;margin-top:3px}.log-in{color:var(--accent)}.log-out{color:var(--accent-burn)}.empty-log{text-align:center;color:var(--text-sub);padding:16px;font-size:.85rem}
-body.light-mode{--bg-main:#f1f5f9;--bg-card:#ffffff;--text-main:#0f172a;--text-sub:#64748b;--border:#dbe3ec}body.light-mode .stat-box{background:rgba(15,23,42,.04)}
+body.light-mode{--bg-main:#f1f5f9;--bg-card:#fff;--text-main:#0f172a;--text-sub:#64748b;--border:#dbe3ec}body.light-mode .stat-box{background:rgba(15,23,42,.04)}
 .item-card{transition:transform .12s ease,box-shadow .12s ease}.item-card:active{transform:scale(.985)}
-</style>
-
-<style>
 .health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.health-grid>div{padding:10px;border:1px solid var(--border);border-radius:12px;text-align:center}.health-grid small{display:block;color:var(--text-sub);font-size:.68rem}.health-grid b{display:block;margin-top:4px;font-size:1rem}.water-title{margin-top:12px;font-weight:700}.water-bar{height:9px;background:var(--border);border-radius:20px;overflow:hidden;margin:8px 0}.water-bar span{display:block;height:100%;background:var(--accent);border-radius:20px;transition:width .25s ease}.water-actions{display:flex;gap:6px}.water-actions button{flex:1;border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);border-radius:10px;padding:8px;font-family:inherit}
 @media(max-width:420px){.health-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
