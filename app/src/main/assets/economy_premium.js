@@ -121,7 +121,107 @@ function open(){
   if(logEl)logEl.innerHTML=log||'هنوز تراکنشی ثبت نشده.';
   m.style.display='flex';
 }
-window.cyOpenEconomy=open;
+
+/* === Coin Feature Unlocks === */
+const FEATURE_UNLOCKS=[
+  {id:'theme_ocean',cost:100,title:'تم اقیانوس',desc:'رنگ‌بندی آبی برای شخصی‌سازی برنامه.'},
+  {id:'advanced_reports',cost:250,title:'گزارش‌های پیشرفته',desc:'گزارش‌های عمیق‌تر از روند کالری و عملکرد.'},
+  {id:'extended_stats',cost:500,title:'آمار گسترده',desc:'دسترسی به تحلیل‌ها و بازه‌های آماری بیشتر.'},
+  {id:'meal_planner_plus',cost:750,title:'برنامه غذایی پیشرفته',desc:'قابلیت‌های پیشرفته‌تر برنامه‌ریزی وعده‌ها.'},
+  {id:'nutrition_plus',cost:1000,title:'تحلیل تغذیه پیشرفته',desc:'تحلیل‌های تکمیلی مواد مغذی و پیشنهادها.'},
+  {id:'goal_plus',cost:1500,title:'اهداف حرفه‌ای',desc:'تنظیمات پیشرفته هدف، کالری و درشت‌مغذی‌ها.'},
+  {id:'planning_plus',cost:2000,title:'بسته برنامه‌ریزی حرفه‌ای',desc:'قابلیت‌های حرفه‌ای برنامه‌ریزی و پیگیری.'},
+  {id:'analytics_plus',cost:3000,title:'تحلیل و گزارش کامل',desc:'بسته کامل تحلیل و گزارش‌های پیشرفته.'},
+  {id:'pro_plus',cost:4000,title:'بسته ویژه PRO',desc:'مجموعه‌ای از چند قابلیت ویژه.'}
+];
+
+function featureUnlocked(id){return st.tier==='pro'||!!(st.features&&st.features[id]);}
+function unlockFeature(id){
+  const f=FEATURE_UNLOCKS.find(x=>x.id===id);
+  if(!f||featureUnlocked(id))return true;
+  if(Number(st.coins||0)<f.cost){alert('برای باز کردن «'+f.title+'» به '+f.cost.toLocaleString('fa-IR')+' سکه نیاز دارید.');return false;}
+  st.coins-=f.cost;
+  st.spent=(Number(st.spent)||0)+f.cost;
+  st.features=st.features||{};
+  st.features[id]={title:f.title,cost:f.cost,unlockedAt:new Date().toISOString()};
+  st.purchases=st.purchases||[];
+  st.purchases.push({type:'spend',amount:f.cost,reason:'باز کردن '+f.title,date:new Date().toISOString()});
+  if(st.purchases.length>100)st.purchases=st.purchases.slice(-100);
+  syncLegacyCoins();
+  save();
+  renderFeatureShop();
+  return true;
+}
+function syncLegacyCoins(){
+  try{
+    if(window.cy410){
+      window.cy410.coins=Number(st.coins)||0;
+      if(typeof window.cy410Save==='function')window.cy410Save();
+    }
+  }catch(e){}
+}
+function syncFromLegacyCoins(){
+  try{
+    const legacy=Number(window.cy410&&window.cy410.coins);
+    if(Number.isFinite(legacy)&&legacy>Number(st.coins||0)){
+      st.coins=legacy;
+      save();
+    }else if(Number.isFinite(legacy)&&legacy<Number(st.coins||0)){
+      syncLegacyCoins();
+    }
+  }catch(e){}
+}
+function renderFeatureShop(){
+  const el=document.getElementById('cy-feature-shop');
+  if(!el)return;
+  el.innerHTML=FEATURE_UNLOCKS.map(f=>{
+    const ok=featureUnlocked(f.id);
+    return '<div class="card" style="margin:0 0 8px;padding:12px">'+
+      '<div style="display:flex;gap:8px;align-items:center">'+
+      '<div style="flex:1"><b>'+f.title+'</b><div style="font-size:.72rem;color:var(--text-sub);margin-top:4px">'+f.desc+'</div></div>'+
+      '<button class="btn '+(ok?'btn-sub':'')+'" '+(ok?'disabled':'onclick="cyEconomy.unlockFeature(\''+f.id+'\')"')+'>'+
+      (ok?'✓ باز شده':f.cost.toLocaleString('fa-IR')+' 🪙')+'</button></div></div>';
+  }).join('');
+}
+window.cyEconomy.unlockFeature=unlockFeature;
+window.cyEconomy.featureUnlocked=featureUnlocked;
+window.cyEconomy.features=()=>FEATURE_UNLOCKS.map(f=>({...f,unlocked:featureUnlocked(f.id)}));
+
+function ensureFeatureShop(){
+  const host=document.getElementById('cy-economy-modal');
+  if(!host)return;
+  if(document.getElementById('cy-feature-shop'))return;
+  const box=document.createElement('div');
+  box.className='card';
+  box.innerHTML='<b>🔓 باز کردن امکانات با سکه</b><p style="font-size:.74rem;color:var(--text-sub);margin:6px 0 10px">لازم نیست برای استفاده از امکانات ویژه تا ۶۰۰۰ سکه صبر کنید؛ هر قابلیت با هزینه خودش دائمی باز می‌شود.</p><div id="cy-feature-shop"></div>';
+  const packs=document.getElementById('cy-coin-packs');
+  if(packs&&packs.parentElement)packs.parentElement.parentElement.insertBefore(box,packs.parentElement);
+  renderFeatureShop();
+}
+
+
+  const oldOpen=open;
+  open=function(){ oldOpen(); setTimeout(()=>{ensureFeatureShop();syncFromLegacyCoins();renderFeatureShop();},0); };
+  window.cyOpenEconomy=open;
+  setTimeout(()=>{
+    syncFromLegacyCoins();
+    if(typeof window.cy410AddCoin==='function'&&!window.__CY_COIN_BRIDGE__){
+      window.__CY_COIN_BRIDGE__=true;
+      const original=window.cy410AddCoin;
+      window.cy410AddCoin=function(amount,reason){
+        const before=Number(st.coins)||0;
+        const result=original.apply(this,arguments);
+        const afterLegacy=Number(window.cy410&&window.cy410.coins);
+        if(Number.isFinite(afterLegacy)){
+          st.coins=Math.max(0,afterLegacy);
+          if(st.coins!==before)save();
+          checkCoinProUnlock();
+        }
+        return result;
+      };
+    }
+  },500);
+
 
 function inject(){
   const d=document.getElementById('tab-settings');
