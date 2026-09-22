@@ -20,6 +20,7 @@ const modifiers = [
 const units = ["100 گرم", "یک عدد", "یک لیوان", "یک برش", "یک پیاله", "یک کف دست", "یک سیخ", "یک پرس"];
 
 const foods = [];
+const seededValue = (n, min, max) => min + ((Math.imul(n, 1103515245) + 12345) >>> 0) % (max - min + 1);
 let idCounter = 1;
 
 // ساخت ترکیب‌های فراوان برای رسیدن به ۲۰ هزار غذا
@@ -38,10 +39,11 @@ for (let pass = 1; pass <= 15; pass++) {
                     }
 
                     // محاسبات کالری و درشت مغذی‌های واقع‌گرایانه
-                    const baseCal = Math.floor(Math.random() * 400) + 20;
-                    const protein = parseFloat((Math.random() * 25).toFixed(1));
-                    const carbs = parseFloat((Math.random() * 50).toFixed(1));
-                    const fat = parseFloat((Math.random() * 20).toFixed(1));
+                    const baseSeed = idCounter + pass * 97 + item.length * 13;
+                    const baseCal = seededValue(baseSeed, 35, 520);
+                    const protein = parseFloat((seededValue(baseSeed + 1, 0, 250) / 10).toFixed(1));
+                    const carbs = parseFloat((seededValue(baseSeed + 2, 0, 600) / 10).toFixed(1));
+                    const fat = parseFloat((seededValue(baseSeed + 3, 0, 250) / 10).toFixed(1));
 
                     foods.push({
                         id: idCounter++,
