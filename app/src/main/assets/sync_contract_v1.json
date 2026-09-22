@@ -1,0 +1,52 @@
+{
+  "protocol": "calorie-yar-health-ecosystem",
+  "version": 1,
+  "apps": {
+    "calorieyar": {
+      "role": "nutrition",
+      "repo": "Ali688273/calorietracker"
+    },
+    "ghadmino": {
+      "role": "steps-activity",
+      "repo": "Ali688273/Ghadmino"
+    },
+    "ashpazBashi": {
+      "role": "recipes-food",
+      "repo": "pending"
+    }
+  },
+  "exchange": {
+    "calorieyar_to_shared": [
+      "profile",
+      "calorieGoal",
+      "water",
+      "weight",
+      "meals",
+      "foodFavorites",
+      "dietPlan",
+      "progress"
+    ],
+    "ghadmino_to_shared": [
+      "steps",
+      "distance",
+      "activeMinutes",
+      "exerciseCalories",
+      "speedSummary"
+    ],
+    "ashpazBashi_to_shared": [
+      "recipes",
+      "ingredients",
+      "servings",
+      "recipeCalories",
+      "mealPlans",
+      "foodFavorites"
+    ]
+  },
+  "rules": {
+    "offlineFirst": true,
+    "versioned": true,
+    "latestValidRecordWins": true,
+    "noSecrets": true,
+    "userConsentRequired": true
+  }
+}
