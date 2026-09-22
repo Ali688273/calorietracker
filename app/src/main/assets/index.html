@@ -546,3 +546,8 @@
 body.light-mode{--bg-main:#f1f5f9;--bg-card:#ffffff;--text-main:#0f172a;--text-sub:#64748b;--border:#dbe3ec}body.light-mode .stat-box{background:rgba(15,23,42,.04)}
 .item-card{transition:transform .12s ease,box-shadow .12s ease}.item-card:active{transform:scale(.985)}
 </style>
+
+<style>
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.health-grid>div{padding:10px;border:1px solid var(--border);border-radius:12px;text-align:center}.health-grid small{display:block;color:var(--text-sub);font-size:.68rem}.health-grid b{display:block;margin-top:4px;font-size:1rem}.water-title{margin-top:12px;font-weight:700}.water-bar{height:9px;background:var(--border);border-radius:20px;overflow:hidden;margin:8px 0}.water-bar span{display:block;height:100%;background:var(--accent);border-radius:20px;transition:width .25s ease}.water-actions{display:flex;gap:6px}.water-actions button{flex:1;border:1px solid var(--border);background:var(--bg-main);color:var(--text-main);border-radius:10px;padding:8px;font-family:inherit}
+@media(max-width:420px){.health-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
