@@ -6,6 +6,7 @@ window.__CY_ECONOMY__=true;
 
 const KEY='calorie_yar_economy_v2';
 const PRO_PRICE_TOMAN=200000;
+const PRO_COIN_COST=6000;
 const COIN_PACKS=[
   {id:'coins_500',coins:500,price:25000,label:'۵۰۰ سکه'},
   {id:'coins_1200',coins:1200,price:50000,label:'۱۲۰۰ سکه'},
@@ -22,8 +23,24 @@ let st={
 try{st=Object.assign(st,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
 const save=()=>localStorage.setItem(KEY,JSON.stringify(st));
 
+// رسیدن به سقف سکه، PRO را به‌صورت دائمی و بدون پرداخت فعال می‌کند.
+// بعد از فعال‌شدن، خرج‌کردن سکه‌ها PRO را غیرفعال نمی‌کند.
+function checkCoinProUnlock(){
+  if(st.tier==='pro')return false;
+  if(Number(st.coins||0)>=PRO_COIN_COST){
+    st.tier='pro';
+    st.proUnlockedByCoins=true;
+    st.proUnlockedAt=new Date().toISOString();
+    save();
+    return true;
+  }
+  return false;
+}
+checkCoinProUnlock();
+
 function tx(amount,reason){
   st.coins=Math.max(0,st.coins+amount);
+  checkCoinProUnlock();
   st.purchases.push({
     type:amount>=0?'earn':'spend',
     amount:Math.abs(amount),
@@ -43,7 +60,7 @@ function purchaseRequest(type,id){
 }
 
 window.cyEconomy={
-  get:()=>({...st,proPriceToman:PRO_PRICE_TOMAN,coinPacks:COIN_PACKS}),
+  get:()=>({...st,proPriceToman:PRO_PRICE_TOMAN,proCoinCost:PRO_COIN_COST,coinPacks:COIN_PACKS}),
   earn:(x,r)=>tx(Math.max(0,Number(x)||0),r||'reward'),
   spend:(x,r)=>{
     x=Math.max(0,Number(x)||0);
@@ -54,6 +71,12 @@ window.cyEconomy={
   isPro:()=>st.tier==='pro',
   purchasePro:()=>purchaseRequest('pro','pro'),
   purchaseCoins:(id)=>purchaseRequest('coins',id),
+  unlockProWithCoins:()=>{
+    checkCoinProUnlock();
+    if(st.tier==='pro'){ open(); return true; }
+    alert('برای فعال‌سازی دائمی PRO باید '+PRO_COIN_COST.toLocaleString('fa-IR')+' سکه جمع کرده باشید.');
+    return false;
+  },
   setPro:(enabled)=>{
     st.tier=enabled?'pro':'free';
     save();
@@ -72,13 +95,13 @@ function open(){
       '<h3>💎 نسخه رایگان، PRO و سکه‌ها</h3>'+
       '<div class="card"><b>نسخه فعلی: '+(st.tier==='pro'?'PRO 💎':'رایگان 🆓')+'</b>'+
       '<div style="font-size:1.6rem;color:var(--accent);margin:8px 0">'+st.coins+' 🪙</div>'+
-      '<small style="color:var(--text-sub)">هسته اصلی برنامه رایگان است و خرید امکانات اختیاری است.</small></div>'+
+      '<small style="color:var(--text-sub)">هسته اصلی برنامه رایگان است. با جمع‌کردن '+PRO_COIN_COST.toLocaleString('fa-IR')+' سکه، PRO به‌صورت دائمی و رایگان فعال می‌شود.</small></div>'+
       '<div class="card"><b>PRO 💎</b>'+
       '<p style="font-size:.78rem;color:var(--text-sub);margin:7px 0">تحلیل‌های پیشرفته، گزارش‌های عمیق، شخصی‌سازی بیشتر، امکانات حرفه‌ای آینده و حذف تبلیغات.</p>'+
-      '<b>'+PRO_PRICE_TOMAN.toLocaleString('fa-IR')+' تومان</b>'+
-      '<button class="btn" style="width:100%;margin-top:8px" onclick="cyEconomy.purchasePro()">خرید PRO</button></div>'+
+      '<b>'+PRO_PRICE_TOMAN.toLocaleString('fa-IR')+' تومان</b>'+\n      '<p style="font-size:.75rem;color:var(--text-sub);margin:6px 0">یا '+PRO_COIN_COST.toLocaleString('fa-IR')+' سکه برای فعال‌سازی دائمی PRO</p>'+
+      '<button class="btn" style="width:100%;margin-top:8px" onclick="cyEconomy.purchasePro()">خرید PRO</button>'+\n      '<button class="btn btn-sub" style="width:100%;margin-top:7px" onclick="cyEconomy.unlockProWithCoins()">فعال‌سازی PRO با سکه</button></div>'+
       '<div class="card"><b>🪙 بسته‌های سکه</b><div id="cy-coin-packs" style="margin-top:8px"></div></div>'+
-      '<div class="card"><b>روش‌های دریافت رایگان</b><p style="font-size:.75rem;color:var(--text-sub);margin-top:7px">ماموریت‌ها، استمرار، دستاوردها و در آینده تبلیغ جایزه‌ای می‌توانند سکه ایجاد کنند.</p></div>'+
+      '<div class="card"><b>روش‌های دریافت رایگان</b><p style="font-size:.75rem;color:var(--text-sub);margin-top:7px">ماموریت‌ها، استمرار، دستاوردها و در آینده تبلیغ جایزه‌ای می‌توانند سکه ایجاد کنند. سکه‌ها سقف زمانی ندارند و با ادامه استفاده جمع می‌شوند؛ پس کاربری که ماه‌ها یا حتی یک سال فعال بماند، می‌تواند با رسیدن به ۶۰۰۰ سکه PRO را دائمی باز کند.</p></div>'+
       '<div class="card"><b>تاریخچه تراکنش‌ها</b><div id="cy-econ-log" style="margin-top:8px"></div></div>'+
       '<div class="modal-actions"><button class="btn btn-sub" onclick="document.getElementById(\'cy-economy-modal\').style.display=\'none\'">بستن</button></div>'+
       '</div>';
