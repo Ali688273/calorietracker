@@ -953,3 +953,25 @@ upgradedInitApp=async function(){await cy410OriginalInit();cy410EnsureProfileCal
 window.removeEventListener('DOMContentLoaded',cy410OriginalInit);
 window.removeEventListener('DOMContentLoaded',upgradedInitApp);
 window.addEventListener('DOMContentLoaded',upgradedInitApp);
+
+// ======================================================
+// توضیح کوتاه BMR / TDEE / CALORIE GOAL / MACROS
+// ======================================================
+function cy410ExplainMetrics(){
+ const old=document.getElementById('cy410-metric-explanations'); if(old) old.remove();
+ const box=document.createElement('div'); box.id='cy410-metric-explanations'; box.className='cy410-section cy410-explanations';
+ box.innerHTML='<b>💡 این اعداد یعنی چه؟</b>'+
+ '<div class="cy410-explain"><strong>BMR 🔥</strong><span>کالری موردنیاز بدن برای انجام فعالیت‌های حیاتی در حالت استراحت.</span></div>'+
+ '<div class="cy410-explain"><strong>TDEE ⚡</strong><span>مقدار تقریبی کالری‌ای که بدن با درنظرگرفتن فعالیت‌های روزانه مصرف می‌کند.</span></div>'+
+ '<div class="cy410-explain"><strong>هدف کالری 🎯</strong><span>مقدار کالری پیشنهادی روزانه بر اساس هدف شما؛ کاهش، حفظ یا افزایش وزن.</span></div>'+
+ '<div class="cy410-explain"><strong>پروتئین 🥩</strong><span>برای ساخت و ترمیم عضلات و حفظ بافت‌های بدن ضروری است.</span></div>'+
+ '<div class="cy410-explain"><strong>کربوهیدرات 🍚</strong><span>یکی از منابع اصلی انرژی بدن برای فعالیت‌های روزانه و ورزش.</span></div>'+
+ '<div class="cy410-explain"><strong>چربی 🥑</strong><span>برای تأمین انرژی، عملکرد بدن و جذب بعضی ویتامین‌ها ضروری است.</span></div>';
+ const panel=document.getElementById('cy410-panel'); if(panel) panel.appendChild(box);
+}
+function cy410InjectExplanationStyles(){
+ if(document.getElementById('cy410-explain-style'))return;
+ const s=document.createElement('style');s.id='cy410-explain-style';s.textContent='.cy410-explain{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);line-height:1.8;font-size:.78rem}.cy410-explain:last-child{border-bottom:0}.cy410-explain strong{min-width:112px;color:var(--accent)}.cy410-explain span{color:var(--text-main)}@media(max-width:380px){.cy410-explain{display:block}.cy410-explain strong{display:block;margin-bottom:2px}}';document.head.appendChild(s)
+}
+const cy410RenderWithExplanations=cy410Render;
+cy410Render=function(){cy410RenderWithExplanations();cy410InjectExplanationStyles();cy410ExplainMetrics()};
