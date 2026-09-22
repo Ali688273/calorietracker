@@ -885,7 +885,14 @@ function cy410Exercise(){
  return (cy410.exerciseHistory||[]).filter(x=>x.date===cy410Today()).reduce((s,x)=>s+cy410Num(x.cal,0),0);
 }
 function cy410AddCoin(amount,reason){
- amount=Math.round(amount); if(!amount)return;
+ amount=Math.round(Number(amount)||0); if(!amount)return;
+ if(window.cyEconomy&&typeof window.cyEconomy.earn==='function'){
+   window.cyEconomy.earn(Math.max(0,amount),reason||'reward');
+   try{cy410.coins=Number(window.cyEconomy.get().coins)||0}catch(e){}
+   cy410.coinTransactions.unshift({date:new Date().toISOString(),amount,reason});
+   cy410.coinTransactions=cy410.coinTransactions.slice(0,100); cy410Save(); cy410Render();
+   return;
+ }
  cy410.coins=Math.max(0,cy410.coins+amount);
  cy410.coinTransactions.unshift({date:new Date().toISOString(),amount,reason});
  cy410.coinTransactions=cy410.coinTransactions.slice(0,100); cy410Save(); cy410Render();
@@ -903,19 +910,19 @@ function cy410RecordFood(food,amount,meal){
  const item={id:Date.now()+Math.random(),name:food.name||'خوراکی',amount:grams,unit:'گرم',cal:Math.round(base*factor),protein:Math.round(cy410Num(food.protein,0)*factor*10)/10,carbs:Math.round(cy410Num(food.carbs||food.carbohydrates,0)*factor*10)/10,fat:Math.round(cy410Num(food.fat,0)*factor*10)/10,date:cy410Today()};
  if(!cy410.meals[meal])cy410.meals[meal]=[]; cy410.meals[meal].push(item);
  cy410.recentFoods=[food.name,...(cy410.recentFoods||[]).filter(n=>n!==food.name)].slice(0,12);
- cy410Save(); cy410Render(); cy410RefreshLegacyDashboard(); cy410AddCoin(2,'ثبت غذا');
+ cy410Save(); cy410Render(); cy410RefreshLegacyDashboard(); cy410AddCoin(1,'ثبت غذا');
 }
 function cy410AddWaterGlass(n=1){
  const d=cy410Today();cy410.waterByDate[d]=Math.max(0,Math.min(20,cy410Num(cy410.waterByDate[d])+n));cy410Save();cy410Render();cy410RefreshLegacyDashboard();
 }
 function cy410AddExercise(name,min,cal){
  cy410.exerciseHistory.push({date:cy410Today(),name,duration:cy410Num(min),cal:Math.round(cy410Num(cal))});
- cy410Save();cy410Render();cy410RefreshLegacyDashboard();cy410AddCoin(2,'ثبت ورزش');
+ cy410Save();cy410Render();cy410RefreshLegacyDashboard();cy410AddCoin(1,'ثبت ورزش');
 }
 function cy410AddWeight(w){
  w=cy410Num(w);if(w<25||w>350)return;
  cy410.weightHistory.push({date:cy410Today(),weight:w});userData.weight=w;
- cy410Save();saveUserData();cy410Render();cy410RefreshLegacyDashboard();cy410AddCoin(3,'ثبت وزن');
+ cy410Save();saveUserData();cy410Render();cy410RefreshLegacyDashboard();cy410AddCoin(1,'ثبت وزن');
 }
 function cy410MealLabel(k){return {breakfast:'صبحانه',lunch:'ناهار',dinner:'شام',snack:'میان‌وعده'}[k]||k}
 function cy410Render(){
@@ -926,9 +933,9 @@ function cy410Render(){
  const remaining=Math.max(0,goal-t.cal);
  const meals=Object.entries(cy410.meals).map(([k,v])=>'<div class="cy410-meal"><b>'+cy410MealLabel(k)+'</b><span>'+v.reduce((s,x)=>s+x.cal,0)+' kcal</span></div>').join('');
  const missions=[
-   cy410Mission('food','ثبت ۳ خوراکی',3,10,cy410Entries().filter(x=>x.date===cy410Today()).length),
-   cy410Mission('water','نوشیدن ۸ لیوان آب',8,12,w.glasses),
-   cy410Mission('exercise','ثبت یک فعالیت',1,10,ex>0?1:0)
+   cy410Mission('food','ثبت ۳ خوراکی',3,1,cy410Entries().filter(x=>x.date===cy410Today()).length),
+   cy410Mission('water','نوشیدن ۸ لیوان آب',8,1,w.glasses),
+   cy410Mission('exercise','ثبت یک فعالیت',1,1,ex>0?1:0)
  ];
  p.innerHTML='<div class="cy410-head"><b>داشبورد سلامت</b><span>🪙 '+cy410.coins+'</span></div>'+
  '<div class="cy410-grid"><div><b>'+t.cal+'</b><small>مصرف</small></div><div><b>'+remaining+'</b><small>باقی‌مانده</small></div><div><b>'+goal+'</b><small>هدف</small></div><div><b>'+ex+'</b><small>ورزش kcal</small></div></div>'+
@@ -1052,7 +1059,7 @@ function cyNextRenderHub(){
  const host=document.getElementById('cy410-panel')||document.querySelector('.container');if(!host)return;
  const p=document.createElement('div');p.id='cynext-hub';p.className='card cynext-hub';
  const r=cyNextReport(), ach=cyNextAchievements();
- ach.forEach(a=>{if(a[3]>=a[2])cyNextClaimAchievement(a[0],a[1],5)});
+ ach.forEach(a=>{if(a[3]>=a[2])cyNextClaimAchievement(a[0],a[1],1)});
  const arows=ach.map(a=>'<div class="cynext-row">'+(cyNext.achievements[a[0]]?'🏆':'⬜')+' '+a[1]+' <span>'+Math.min(a[3],a[2])+'/'+a[2]+'</span></div>').join('');
  const recipes=cyNext.recipes.slice(0,4).map(x=>'<div class="cynext-row">🍲 '+x.name+' <span>'+x.kcal+' kcal/وعده</span></div>').join('')||'<small>هنوز دستوری ذخیره نشده است.</small>';
  const plans=cyNext.mealPlans.slice(0,4).map(x=>'<div class="cynext-row">📅 '+x.name+' <span>'+x.kcal+' kcal</span></div>').join('')||'<small>هنوز برنامه‌ای ذخیره نشده است.</small>';
@@ -1200,8 +1207,8 @@ window.cyNextAddPlan=function(){var name=prompt('نام وعده/غذا');if(!na
 window.cyNextDeletePlan=function(i){st.mealPlan.splice(i,1);save();plan()};
 function achievements(){
 var foodCount=entries().length,water=(typeof cy410Water==='function'?cy410Water():{glasses:0}).glasses||0,ex=(cy410.exerciseHistory||[]).length;
-var a=[['firstFood','🥗 اولین ثبت غذا',foodCount>=1,5],['tenFoods','🍽️ ده ثبت غذا',foodCount>=10,15],['water8','💧 هشت لیوان آب',water>=8,10],['exercise5','🏃 پنج تمرین',ex>=5,15],['weight','⚖️ ثبت وزن',((cy410.weightHistory||[]).length)>=1,5]];
-var body=a.map(function(x){var got=!!st.achievements[x[0]];if(x[2]&&!got){st.achievements[x[0]]=day();if(typeof cy410AddCoins==='function')cy410AddCoins(x[3],'achievement')}return '<div class="cy-next-row"><span>'+x[1]+'<small>'+ (x[2]?'کامل شده':'در انتظار')+' · جایزه '+x[3]+' سکه</small></span><span class="cy-next-badge">'+(x[2]?'✓':'🔒')+'</span></div>'}).join('');
+var a=[['firstFood','🥗 اولین ثبت غذا',foodCount>=1,1],['tenFoods','🍽️ ده ثبت غذا',foodCount>=10,2],['water8','💧 هشت لیوان آب',water>=8,2],['exercise5','🏃 پنج تمرین',ex>=5,2],['weight','⚖️ ثبت وزن',((cy410.weightHistory||[]).length)>=1,1]];
+var body=a.map(function(x){var got=!!st.achievements[x[0]];if(x[2]&&!got){st.achievements[x[0]]=day();if(typeof cy410AddCoins==='function')cy410AddCoin(x[3],'achievement')}return '<div class="cy-next-row"><span>'+x[1]+'<small>'+ (x[2]?'کامل شده':'در انتظار')+' · جایزه '+x[3]+' سکه</small></span><span class="cy-next-badge">'+(x[2]?'✓':'🔒')+'</span></div>'}).join('');
 save();modal('cy-ach-modal','🏆 دستاوردها',body).classList.add('open')
 }
 function injectHub(){
